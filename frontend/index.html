@@ -3,63 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MySocial 🌌 - หน้าฟีด</title>
-<link rel="stylesheet" href="css/style.css">
+<title>MADOO</title>
+<script>
+window.location.href = 'profile.html';
+</script>
 </head>
 <body>
-
-<div class="navbar">
-  <a href="index.html" class="nav-brand">🌌 MySocial</a>
-  <div class="nav-links">
-    <a href="index.html" class="nav-link active">🏠 ฟีด</a>
-    <a href="search.html" class="nav-link">🔍 ค้นหา</a>
-    <a href="profile.html" id="myProfileLink" class="nav-link">👤 โปรไฟล์</a>
-    <button class="btn-logout" onclick="logout()">🚪 ออกจากระบบ</button>
-  </div>
-</div>
-
-<div class="container">
-
-  <!-- กล่องสร้างโพสต์ -->
-  <div class="card post-form">
-    <div class="post-header">
-      <div class="post-header-left">
-        <img id="myAvatar" class="avatar" src="" alt="Avatar">
-        <div>
-          <strong id="myUsername" style="font-size:16px; font-weight:700; color:var(--text-main);"></strong>
-          <div style="font-size:12px; color:var(--accent-cyan); font-weight:600; display:flex; align-items:center; gap:4px; margin-top:2px;">
-            <span>🌐 สาธารณะ</span> · <span style="color:var(--accent-pink);">⚡ Live Feed</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <textarea id="postContent" placeholder="คุณกำลังคิดอะไรอยู่? แบ่งปันเรื่องราวของคุณกับทุกคน..."></textarea>
-
-    <!-- พรีวิวรูปภาพที่เลือก -->
-    <div id="imagePreviewContainer" style="display:none; position:relative; margin-top:12px;">
-      <img id="imagePreview" style="max-width:100%; max-height:340px; border-radius:12px; display:block; border: 1px solid var(--card-border); box-shadow:0 8px 24px rgba(0,0,0,0.3);">
-      <button type="button" id="removeImageBtn" title="ลบรูปภาพ">✕</button>
-    </div>
-
-    <div class="form-actions">
-      <label class="file-label">
-        🖼️ เพิ่มรูปภาพ
-        <input type="file" id="postImage" accept="image/*" style="display:none">
-      </label>
-      <button class="btn btn-primary" id="submitPostBtn">✨ โพสต์เลย</button>
-    </div>
-    <div id="postError" class="error-msg" style="display:none; margin-top:10px;"></div>
-  </div>
-
-  <!-- รายการโพสต์ -->
-  <div id="feedContainer"></div>
-  <div id="feedEmpty" class="text-muted" style="text-align:center; display:none; padding:60px 0; font-size:15px;">
-    ยังไม่มีโพสต์ในฟีด พิมพ์ข้อความด้านบนแล้วกด "โพสต์เลย" ได้เลยครับ! 🚀
-  </div>
-
-</div>
-
-<script src="js/api.js"></script>
-<script src="js/feed.js"></script>
 </body>
 </html>

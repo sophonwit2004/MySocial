@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>เข้าสู่ระบบ - MySocial 🌌</title>
+<title>เข้าสู่ระบบ - MADOO</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="auth-page">
 
 <div class="auth-box">
   <div class="auth-brand">
-    <h1>🌌 MySocial</h1>
-    <p>เชื่อมต่อและแบ่งปันเรื่องราวกับเพื่อนๆ ของคุณ</p>
+    <h1>✨ MADOO</h1>
+    <p>เชื่อมต่อและค้นพบเรื่องราวใหม่ๆ บน MADOO</p>
   </div>
 
   <div id="errorMsg" class="error-msg" style="display:none;"></div>
@@ -51,7 +51,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   try {
     const data = await apiRequest('/auth/login', 'POST', { email, password });
     saveAuth(data.token, data.user);
-    window.location.href = 'index.html';
+    window.location.href = 'profile.html';
   } catch (err) {
     errorMsg.textContent = err.message;
     errorMsg.style.display = 'block';
@@ -81,7 +81,7 @@ document.getElementById('demoLoginBtn').addEventListener('click', async () => {
       });
     }
     saveAuth(data.token, data.user);
-    window.location.href = 'index.html';
+    window.location.href = 'profile.html';
   } catch (err) {
     errorMsg.style.color = 'var(--accent-pink)';
     errorMsg.textContent = err.message;
