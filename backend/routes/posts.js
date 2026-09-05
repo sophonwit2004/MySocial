@@ -127,14 +127,11 @@ router.post('/', authMiddleware, (req, res, next) => {
   }
 });
 
-// ดึงฟีด: โพสต์ของตัวเอง + คนที่ติดตาม เรียงจากใหม่ไปเก่า
+// ดึงฟีด: แสดงโพสต์ทั้งหมดในระบบ เรียงจากใหม่ไปเก่า
 router.get('/feed', authMiddleware, async (req, res) => {
   if (mongoose.connection.readyState === 1) {
     try {
-      const currentUser = await User.findById(req.userId);
-      const userIds = currentUser ? [...currentUser.following, req.userId] : [req.userId];
-
-      const posts = await Post.find({ user: { $in: userIds } })
+      const posts = await Post.find()
         .sort({ createdAt: -1 })
         .populate('user', 'username profilePic')
         .populate('comments.user', 'username profilePic');
