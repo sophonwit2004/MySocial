@@ -16,6 +16,13 @@
     <input type="password" id="password" placeholder="รหัสผ่าน" required minlength="6">
     <button type="submit" class="btn">สมัครสมาชิก</button>
   </form>
+
+  <div style="margin-top: 12px;">
+    <button type="button" id="demoLoginBtn" class="btn btn-secondary" style="background: #42b72a; color: white; font-weight: bold;">
+      🚀 เข้าสู่ระบบด่วน (บัญชีทดลอง)
+    </button>
+  </div>
+
   <div class="auth-switch">
     มีบัญชีอยู่แล้ว? <a href="login.html">เข้าสู่ระบบ</a>
   </div>
@@ -36,6 +43,33 @@ document.getElementById('registerForm').addEventListener('submit', async (e) => 
     saveAuth(data.token, data.user);
     window.location.href = 'index.html';
   } catch (err) {
+    errorMsg.textContent = err.message;
+  }
+});
+
+document.getElementById('demoLoginBtn').addEventListener('click', async () => {
+  const errorMsg = document.getElementById('errorMsg');
+  errorMsg.style.color = '#1877f2';
+  errorMsg.textContent = 'กำลังเข้าสู่ระบบทดลอง...';
+
+  const demoEmail = 'demo@example.com';
+  const demoPassword = 'password123';
+
+  try {
+    let data;
+    try {
+      data = await apiRequest('/auth/login', 'POST', { email: demoEmail, password: demoPassword });
+    } catch (err) {
+      data = await apiRequest('/auth/register', 'POST', { 
+        username: 'DemoUser', 
+        email: demoEmail, 
+        password: demoPassword 
+      });
+    }
+    saveAuth(data.token, data.user);
+    window.location.href = 'index.html';
+  } catch (err) {
+    errorMsg.style.color = '#e41e3f';
     errorMsg.textContent = err.message;
   }
 });
