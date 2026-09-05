@@ -155,10 +155,18 @@ function calculateDistanceKm(lat1, lon1, lat2, lon2) {
 
 // การจัดการการเลือกรูปภาพ
 let selectedImageFile = null;
+const attachImageBtn = document.getElementById('attachImageBtn');
 const postImageInput = document.getElementById('postImage');
 const imagePreviewContainer = document.getElementById('imagePreviewContainer');
 const imagePreview = document.getElementById('imagePreview');
 const removeImageBtn = document.getElementById('removeImageBtn');
+
+if (attachImageBtn && postImageInput) {
+  attachImageBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    postImageInput.click();
+  });
+}
 
 if (postImageInput) {
   postImageInput.addEventListener('change', (e) => {

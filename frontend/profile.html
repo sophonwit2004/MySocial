@@ -36,10 +36,10 @@
     <div id="ownProfileActions" style="display:none; margin-top:18px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 16px;">
       <textarea id="bioInput" placeholder="เขียนเกี่ยวกับตัวคุณ..."></textarea>
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-        <label class="file-label">
+        <button type="button" id="changeProfilePicBtn" class="file-label">
           📷 เปลี่ยนรูปโปรไฟล์
-          <input type="file" id="profilePicInput" accept="image/*" style="display:none">
-        </label>
+        </button>
+        <input type="file" id="profilePicInput" accept="image/*" style="display:none">
         <button id="saveProfileBtn" class="btn btn-primary">💾 บันทึกโปรไฟล์</button>
       </div>
     </div>

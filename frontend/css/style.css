@@ -225,6 +225,8 @@ body {
   border-radius: 20px;
   font-size: 13px;
   font-weight: 600;
+  font-family: inherit;
+  outline: none;
   cursor: pointer;
   transition: all 0.2s ease;
 }

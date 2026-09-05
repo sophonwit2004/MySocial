@@ -44,7 +44,17 @@ function updateFollowBtn(btn, isFollowing) {
   btn.classList.toggle('following', isFollowing);
 }
 
-document.getElementById('profilePicInput')?.addEventListener('change', (e) => {
+const changeProfilePicBtn = document.getElementById('changeProfilePicBtn');
+const profilePicInput = document.getElementById('profilePicInput');
+
+if (changeProfilePicBtn && profilePicInput) {
+  changeProfilePicBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    profilePicInput.click();
+  });
+}
+
+profilePicInput?.addEventListener('change', (e) => {
   selectedProfilePicFile = e.target.files[0];
 });
 
