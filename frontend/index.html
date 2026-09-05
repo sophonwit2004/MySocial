@@ -103,6 +103,11 @@
         <option value="latest">🕒 ใหม่ล่าสุด</option>
         <option value="distance">📍 ใกล้ที่สุด (เรียงตามระยะทาง)</option>
       </select>
+      <button type="button" onclick="exportPostsBackup()" class="btn-gps" style="padding:4px 10px; font-size:12px; background:rgba(16,185,129,0.15); border-color:rgba(16,185,129,0.3); color:#10b981;">💾 สำรองข้อมูล</button>
+      <label class="btn-gps" style="padding:4px 10px; font-size:12px; cursor:pointer; background:rgba(168,85,247,0.15); border-color:rgba(168,85,247,0.3); color:#c084fc;">
+        📥 นำเข้าสำรอง
+        <input type="file" accept=".json" style="display:none" onchange="handleImportBackup(event)">
+      </label>
     </div>
   </div>
 

@@ -282,7 +282,7 @@ async function loadFeed() {
     serverPosts = [];
   }
 
-  const localSavedPosts = getSavedLocalPosts();
+  const localSavedPosts = await getSavedLocalPostsAsync();
 
   // รวมโพสต์จากทั้ง LocalStorage และ Server โดยกรอง ID ที่ซ้ำกัน
   const postsMap = new Map();

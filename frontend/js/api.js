@@ -74,8 +74,65 @@ function compressImage(file, maxWidth = 800, maxHeight = 800, quality = 0.7) {
   });
 }
 
-// ==== ระบบบันทึกโพสต์ถาวรใน LocalStorage เพื่อไม่ให้โพสต์หายเมื่อรีเฟรช/ออกจากระบบแล้วเข้าใหม่ ====
-function getSavedLocalPosts() {
+// ==== ระบบสำรองข้อมูลโพสต์ถาวรผ่าน IndexedDB + LocalStorage + SessionStorage ====
+const DB_NAME = 'MADOO_AppDB';
+const DB_VERSION = 1;
+const STORE_NAME = 'posts';
+
+function openIndexedDB() {
+  return new Promise((resolve) => {
+    if (!window.indexedDB) return resolve(null);
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: '_id' });
+      }
+    };
+    req.onsuccess = (e) => resolve(e.target.result);
+    req.onerror = () => resolve(null);
+  });
+}
+
+async function savePostToIndexedDB(post) {
+  try {
+    const db = await openIndexedDB();
+    if (!db) return;
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    store.put(post);
+  } catch (err) {
+    console.error('IndexedDB Save Error:', err);
+  }
+}
+
+async function getPostsFromIndexedDB() {
+  try {
+    const db = await openIndexedDB();
+    if (!db) return [];
+    return new Promise((resolve) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => resolve([]);
+    });
+  } catch (err) {
+    return [];
+  }
+}
+
+async function deletePostFromIndexedDB(postId) {
+  try {
+    const db = await openIndexedDB();
+    if (!db) return;
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    store.delete(postId);
+  } catch (err) {}
+}
+
+function getSavedLocalPostsSync() {
   try {
     const data = localStorage.getItem('madoo_saved_posts');
     return data ? JSON.parse(data) : [];
@@ -84,34 +141,108 @@ function getSavedLocalPosts() {
   }
 }
 
-function saveLocalPost(post) {
+async function getSavedLocalPostsAsync() {
+  const dbPosts = await getPostsFromIndexedDB();
+  const lsPosts = getSavedLocalPostsSync();
+  let ssPosts = [];
   try {
-    if (!post || !post._id) return;
-    const posts = getSavedLocalPosts();
-    // กรองถ้ามี ID ซ้ำ และเพิ่มไว้บนสุด
+    const ssData = sessionStorage.getItem('madoo_backup_posts');
+    ssPosts = ssData ? JSON.parse(ssData) : [];
+  } catch (e) {}
+
+  const map = new Map();
+  dbPosts.forEach(p => { if (p && p._id) map.set(p._id, p); });
+  lsPosts.forEach(p => { if (p && p._id) map.set(p._id, p); });
+  ssPosts.forEach(p => { if (p && p._id) map.set(p._id, p); });
+
+  const merged = Array.from(map.values());
+  merged.sort((a, b) => new Date(b.createdAt || Date.now()) - new Date(a.createdAt || Date.now()));
+  return merged;
+}
+
+function getSavedLocalPosts() {
+  return getSavedLocalPostsSync();
+}
+
+async function saveLocalPost(post) {
+  if (!post || !post._id) return;
+
+  // 1. บันทึกลง IndexedDB (ความจุระดับ GB)
+  await savePostToIndexedDB(post);
+
+  // 2. บันทึกลง LocalStorage
+  try {
+    const posts = getSavedLocalPostsSync();
     const filtered = posts.filter(p => p._id !== post._id);
     filtered.unshift(post);
 
     try {
       localStorage.setItem('madoo_saved_posts', JSON.stringify(filtered));
     } catch (quotaErr) {
-      // หากเกินความจุเบราว์เซอร์ ให้ย่อเก็บเฉพาะ 20 โพสต์ล่าสุด
-      const trimmed = filtered.slice(0, 20);
+      const trimmed = filtered.slice(0, 30);
       localStorage.setItem('madoo_saved_posts', JSON.stringify(trimmed));
     }
-  } catch (err) {
-    console.error('Cannot save post to localStorage:', err);
-  }
+  } catch (err) {}
+
+  // 3. บันทึกลง SessionStorage
+  try {
+    const posts = getSavedLocalPostsSync();
+    sessionStorage.setItem('madoo_backup_posts', JSON.stringify(posts.slice(0, 30)));
+  } catch (e) {}
 }
 
-function removeSavedLocalPost(postId) {
+async function removeSavedLocalPost(postId) {
+  deletePostFromIndexedDB(postId);
   try {
-    let posts = getSavedLocalPosts();
+    let posts = getSavedLocalPostsSync();
     posts = posts.filter(p => p._id !== postId);
     localStorage.setItem('madoo_saved_posts', JSON.stringify(posts));
-  } catch (err) {
-    console.error('Cannot remove post from localStorage:', err);
-  }
+  } catch (err) {}
+  try {
+    let ssPosts = JSON.parse(sessionStorage.getItem('madoo_backup_posts') || '[]');
+    ssPosts = ssPosts.filter(p => p._id !== postId);
+    sessionStorage.setItem('madoo_backup_posts', JSON.stringify(ssPosts));
+  } catch (err) {}
+}
+
+// ==== ฟังก์ชัน Export / Import ไฟล์สำรองข้อมูล JSON ====
+async function exportPostsBackup() {
+  const posts = await getSavedLocalPostsAsync();
+  const jsonStr = JSON.stringify(posts, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `MADOO_Backup_Posts_${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function handleImportBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (Array.isArray(imported)) {
+        for (const post of imported) {
+          if (post && post._id) {
+            await saveLocalPost(post);
+          }
+        }
+        alert(`🎉 นำเข้าสำรองข้อมูลสำเร็จ ${imported.length} โพสต์!`);
+        if (typeof loadFeed === 'function') loadFeed();
+      } else {
+        alert('ไฟล์สำรองไม่ถูกต้อง');
+      }
+    } catch (err) {
+      alert('เกิดข้อผิดพลาดในการอ่านไฟล์สำรอง: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
 }
 
 // ฟังก์ชันกลางสำหรับเรียก API แบบ JSON
