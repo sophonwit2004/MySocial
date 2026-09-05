@@ -2,28 +2,30 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>เข้าสู่ระบบ - MySocial</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เข้าสู่ระบบ - MySocial 🌌</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <div class="auth-box">
-  <h2>เข้าสู่ระบบ</h2>
-  <div id="errorMsg" class="error-msg"></div>
+  <h2>🌌 MySocial</h2>
+  <p style="text-align:center; color:var(--text-muted); font-size:14px; margin-bottom:20px;">เข้าสู่ระบบจักรวาลโซเชียลของคุณ</p>
+  <div id="errorMsg" class="error-msg" style="display:none;"></div>
   <form id="loginForm">
-    <input type="email" id="email" placeholder="อีเมล" required>
-    <input type="password" id="password" placeholder="รหัสผ่าน" required>
-    <button type="submit" class="btn">เข้าสู่ระบบ</button>
+    <input type="email" id="email" placeholder="📧 อีเมลของคุณ" required>
+    <input type="password" id="password" placeholder="🔒 รหัสผ่าน" required>
+    <button type="submit" class="btn">⚡ เข้าสู่ระบบ</button>
   </form>
 
-  <div style="margin-top: 12px;">
-    <button type="button" id="demoLoginBtn" class="btn btn-secondary" style="background: #42b72a; color: white; font-weight: bold;">
+  <div style="margin-top: 14px;">
+    <button type="button" id="demoLoginBtn" class="btn btn-secondary" style="background: linear-gradient(135deg, #00f5a0 0%, #00d9f6 100%); color: #06070d; font-weight: 800; border:none; box-shadow: 0 4px 20px rgba(0, 245, 160, 0.4);">
       🚀 เข้าสู่ระบบด่วน (บัญชีทดลอง)
     </button>
   </div>
 
   <div class="auth-switch">
-    ยังไม่มีบัญชี? <a href="register.html">สมัครสมาชิก</a>
+    ยังไม่มีบัญชี? <a href="register.html">สมัครสมาชิกที่นี่</a>
   </div>
 </div>
 
@@ -34,7 +36,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   const errorMsg = document.getElementById('errorMsg');
-  errorMsg.textContent = '';
+  errorMsg.style.display = 'none';
 
   try {
     const data = await apiRequest('/auth/login', 'POST', { email, password });
@@ -42,13 +44,17 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     window.location.href = 'index.html';
   } catch (err) {
     errorMsg.textContent = err.message;
+    errorMsg.style.display = 'block';
   }
 });
 
 document.getElementById('demoLoginBtn').addEventListener('click', async () => {
   const errorMsg = document.getElementById('errorMsg');
-  errorMsg.style.color = '#1877f2';
-  errorMsg.textContent = 'กำลังเข้าสู่ระบบทดลอง...';
+  errorMsg.style.display = 'block';
+  errorMsg.style.color = 'var(--accent-cyan)';
+  errorMsg.style.background = 'rgba(0, 240, 255, 0.1)';
+  errorMsg.style.borderColor = 'rgba(0, 240, 255, 0.3)';
+  errorMsg.textContent = '🚀 กำลังเข้าสู่ระบบทดลอง...';
 
   const demoEmail = 'demo@example.com';
   const demoPassword = 'password123';
@@ -67,7 +73,7 @@ document.getElementById('demoLoginBtn').addEventListener('click', async () => {
     saveAuth(data.token, data.user);
     window.location.href = 'index.html';
   } catch (err) {
-    errorMsg.style.color = '#e41e3f';
+    errorMsg.style.color = '#ff3366';
     errorMsg.textContent = err.message;
   }
 });

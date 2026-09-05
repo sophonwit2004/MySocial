@@ -2,17 +2,18 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>โปรไฟล์ - MySocial</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>โปรไฟล์ - MySocial 🌌</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <div class="navbar">
-  <h1>MySocial</h1>
+  <h1>🌌 MySocial</h1>
   <div class="nav-links">
-    <a href="index.html">ฟีด</a>
-    <a href="search.html">ค้นหา</a>
-    <button onclick="logout()">ออกจากระบบ</button>
+    <a href="index.html">🏠 ฟีด</a>
+    <a href="search.html">🔍 ค้นหา</a>
+    <button onclick="logout()">🚪 ออกจากระบบ</button>
   </div>
 </div>
 
@@ -22,8 +23,8 @@
     <div class="profile-header">
       <img id="profileAvatar" class="avatar" src="">
       <div>
-        <h2 id="profileUsername"></h2>
-        <p id="profileBio" class="text-muted"></p>
+        <h2 id="profileUsername" style="font-family:'Outfit',sans-serif; font-size:26px; color:var(--text-main);"></h2>
+        <p id="profileBio" class="text-muted" style="margin-top:4px;"></p>
         <div class="follow-list">
           <span><strong id="followersCount">0</strong> ผู้ติดตาม</span>
           <span><strong id="followingCount">0</strong> กำลังติดตาม</span>
@@ -31,16 +32,16 @@
       </div>
     </div>
 
-    <div id="ownProfileActions" style="display:none; margin-top:14px;">
+    <div id="ownProfileActions" style="display:none; margin-top:18px;">
       <textarea id="bioInput" placeholder="เขียนเกี่ยวกับตัวคุณ..."></textarea>
-      <label class="file-label">
+      <label class="file-label" style="display:inline-flex; align-items:center; gap:8px; background:rgba(0, 240, 255, 0.1); border:1px solid rgba(0, 240, 255, 0.3); padding:8px 16px; border-radius:20px; font-weight:600;">
         📷 เปลี่ยนรูปโปรไฟล์
         <input type="file" id="profilePicInput" accept="image/*" style="display:none">
       </label>
-      <button id="saveProfileBtn" class="btn" style="margin-top:10px">บันทึกโปรไฟล์</button>
+      <button id="saveProfileBtn" class="btn" style="margin-top:14px">💾 บันทึกโปรไฟล์</button>
     </div>
 
-    <button id="followBtn" class="follow-btn" style="display:none; margin-top:14px;"></button>
+    <button id="followBtn" class="follow-btn" style="display:none; margin-top:18px;"></button>
   </div>
 
   <div id="userPosts"></div>

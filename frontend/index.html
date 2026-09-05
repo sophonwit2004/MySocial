@@ -2,13 +2,14 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>MySocial - หน้าฟีด</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MySocial 🌌 - หน้าฟีด</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <div class="navbar">
-  <h1>MySocial</h1>
+  <h1>🌌 MySocial</h1>
   <div class="nav-links">
     <a href="search.html">🔍 ค้นหา</a>
     <a href="profile.html" id="myProfileLink">👤 โปรไฟล์</a>
@@ -22,31 +23,33 @@
     <div class="post-header">
       <img id="myAvatar" class="avatar" src="">
       <div>
-        <strong id="myUsername"></strong>
-        <div style="font-size:12px;color:#65676b">🌐 สาธารณะ</div>
+        <strong id="myUsername" style="font-size:17px; font-weight:700; color:var(--text-main);"></strong>
+        <div style="font-size:12px; color:var(--accent-cyan); font-weight:600; display:flex; align-items:center; gap:4px;">
+          <span>🌐 สาธารณะ</span> · <span style="color:var(--accent-pink);">⚡ Live</span>
+        </div>
       </div>
     </div>
-    <textarea id="postContent" placeholder="คุณกำลังคิดอะไรอยู่?"></textarea>
+    <textarea id="postContent" placeholder="คุณกำลังคิดอะไรอยู่? แบ่งปันให้จักรวาลรู้สิ..."></textarea>
 
     <!-- พรีวิวรูปภาพที่เลือก -->
     <div id="imagePreviewContainer" style="display:none; position:relative; margin-top:10px;">
-      <img id="imagePreview" style="max-width:100%; max-height:300px; border-radius:8px; display:block;">
-      <button type="button" id="removeImageBtn" style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.6); color:#fff; border:none; border-radius:50%; width:28px; height:28px; cursor:pointer; font-weight:bold;">✕</button>
+      <img id="imagePreview" style="max-width:100%; max-height:320px; border-radius:12px; display:block; border: 1px solid var(--glass-border); box-shadow:0 0 20px rgba(0,240,255,0.2);">
+      <button type="button" id="removeImageBtn" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.8); color:#ff3366; border:1px solid rgba(255,51,102,0.4); border-radius:50%; width:32px; height:32px; cursor:pointer; font-weight:bold; font-size:16px;">✕</button>
     </div>
 
-    <div class="form-actions" style="margin-top:12px;">
-      <label class="file-label" style="display:inline-flex; align-items:center; gap:6px; background:#e4e6eb; padding:8px 14px; border-radius:20px; font-weight:600;">
+    <div class="form-actions" style="margin-top:14px; display:flex; justify-content:space-between; align-items:center;">
+      <label class="file-label" style="display:inline-flex; align-items:center; gap:8px; background:rgba(0, 240, 255, 0.1); border:1px solid rgba(0, 240, 255, 0.3); padding:8px 16px; border-radius:20px; font-weight:600; color:var(--accent-cyan);">
         🖼️ เพิ่มรูปภาพ
         <input type="file" id="postImage" accept="image/*" style="display:none">
       </label>
-      <button class="btn" style="width:auto; padding:8px 24px; border-radius:20px; font-weight:bold;" id="submitPostBtn">โพสต์</button>
+      <button class="btn" style="width:auto; padding:10px 28px; border-radius:20px; font-weight:bold;" id="submitPostBtn">✨ โพสต์</button>
     </div>
-    <div id="postError" class="error-msg"></div>
+    <div id="postError" class="error-msg" style="display:none; margin-top:10px;"></div>
   </div>
 
   <div id="feedContainer"></div>
-  <div id="feedEmpty" class="text-muted" style="text-align:center; display:none; padding:40px 0;">
-    ยังไม่มีโพสต์ในฟีด พิมพ์อะไรสักอย่างในกล่องด้านบนแล้วกด "โพสต์" ได้เลยครับ!
+  <div id="feedEmpty" class="text-muted" style="text-align:center; display:none; padding:50px 0; font-size:15px;">
+    ยังไม่มีโพสต์ในฟีด พิมพ์อะไรสักอย่างในกล่องด้านบนแล้วกด "โพสต์" ได้เลยครับ! 🚀
   </div>
 
 </div>
