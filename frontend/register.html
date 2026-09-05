@@ -6,24 +6,37 @@
 <title>สมัครสมาชิก - MySocial 🌌</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body class="auth-page">
 
 <div class="auth-box">
-  <h2>✨ สมัครสมาชิก</h2>
-  <p style="text-align:center; color:var(--text-muted); font-size:14px; margin-bottom:20px;">สร้างบัญชีใหม่เข้าสู่จักรวาล MySocial</p>
+  <div class="auth-brand">
+    <h1>🌌 MySocial</h1>
+    <p>สมัครสมาชิกใหม่เข้าสู่ระบบ MySocial</p>
+  </div>
+
   <div id="errorMsg" class="error-msg" style="display:none;"></div>
+
   <form id="registerForm">
-    <input type="text" id="username" placeholder="👤 ชื่อผู้ใช้ (username)" required>
-    <input type="email" id="email" placeholder="📧 อีเมล" required>
-    <input type="password" id="password" placeholder="🔒 รหัสผ่าน" required minlength="6">
-    <button type="submit" class="btn">✨ สมัครสมาชิกเลย</button>
+    <div class="form-group">
+      <label for="username">ชื่อผู้ใช้ (Username)</label>
+      <input type="text" id="username" placeholder="username" required>
+    </div>
+    <div class="form-group">
+      <label for="email">อีเมล</label>
+      <input type="email" id="email" placeholder="example@email.com" required>
+    </div>
+    <div class="form-group">
+      <label for="password">รหัสผ่าน</label>
+      <input type="password" id="password" placeholder="••••••••" required minlength="6">
+    </div>
+    <button type="submit" class="btn btn-primary btn-full">✨ สมัครสมาชิก</button>
   </form>
 
-  <div style="margin-top: 14px;">
-    <button type="button" id="demoLoginBtn" class="btn btn-secondary" style="background: linear-gradient(135deg, #00f5a0 0%, #00d9f6 100%); color: #06070d; font-weight: 800; border:none; box-shadow: 0 4px 20px rgba(0, 245, 160, 0.4);">
-      🚀 เข้าสู่ระบบด่วน (บัญชีทดลอง)
-    </button>
-  </div>
+  <div class="divider"><span>หรือ</span></div>
+
+  <button type="button" id="demoLoginBtn" class="btn btn-demo btn-full">
+    🚀 เข้าสู่ระบบด่วน (บัญชีทดลอง 1-Click)
+  </button>
 
   <div class="auth-switch">
     มีบัญชีอยู่แล้ว? <a href="login.html">เข้าสู่ระบบ</a>
@@ -54,8 +67,8 @@ document.getElementById('demoLoginBtn').addEventListener('click', async () => {
   const errorMsg = document.getElementById('errorMsg');
   errorMsg.style.display = 'block';
   errorMsg.style.color = 'var(--accent-cyan)';
-  errorMsg.style.background = 'rgba(0, 240, 255, 0.1)';
-  errorMsg.style.borderColor = 'rgba(0, 240, 255, 0.3)';
+  errorMsg.style.background = 'rgba(56, 189, 248, 0.12)';
+  errorMsg.style.borderColor = 'rgba(56, 189, 248, 0.3)';
   errorMsg.textContent = '🚀 กำลังเข้าสู่ระบบทดลอง...';
 
   const demoEmail = 'demo@example.com';
@@ -75,7 +88,7 @@ document.getElementById('demoLoginBtn').addEventListener('click', async () => {
     saveAuth(data.token, data.user);
     window.location.href = 'index.html';
   } catch (err) {
-    errorMsg.style.color = '#ff3366';
+    errorMsg.style.color = 'var(--accent-pink)';
     errorMsg.textContent = err.message;
   }
 });

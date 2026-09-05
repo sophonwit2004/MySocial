@@ -15,11 +15,6 @@ if (document.getElementById('sidebarAvatar')) {
     ? resolveImage(currentUser.profilePic)
     : 'https://ui-avatars.com/api/?name=' + currentUser.username;
 }
-if (document.getElementById('storyUserAvatar')) {
-  document.getElementById('storyUserAvatar').src = currentUser.profilePic
-    ? resolveImage(currentUser.profilePic)
-    : 'https://ui-avatars.com/api/?name=' + currentUser.username;
-}
 
 let selectedImageFile = null;
 
@@ -77,9 +72,6 @@ document.getElementById('submitPostBtn').addEventListener('click', async () => {
     selectedImageFile = null;
     imagePreview.src = '';
     imagePreviewContainer.style.display = 'none';
-    if (document.getElementById('expandedComposer')) {
-      document.getElementById('expandedComposer').style.display = 'none';
-    }
 
     // เพิ่มโพสต์ใหม่ไว้บนสุดของฟีดทันที
     const feedContainer = document.getElementById('feedContainer');
@@ -93,7 +85,7 @@ document.getElementById('submitPostBtn').addEventListener('click', async () => {
     errorBox.style.display = 'block';
   } finally {
     submitBtn.disabled = false;
-    submitBtn.textContent = 'โพสต์';
+    submitBtn.textContent = '✨ โพสต์เลย';
   }
 });
 
@@ -149,11 +141,11 @@ function renderPostCard(post) {
           </div>
         </div>
       </div>
-      ${canDelete ? `<button class="delete-btn icon-circle-btn" style="width:32px; height:32px; font-size:14px;" title="ลบโพสต์">🗑️</button>` : ''}
+      ${canDelete ? `<button class="delete-btn icon-circle-btn" style="width:34px; height:34px; font-size:14px;" title="ลบโพสต์">🗑️</button>` : ''}
     </div>
 
-    ${post.content ? `<div style="font-size:15px; margin-bottom:10px; white-space:pre-wrap;">${escapeHtml(post.content)}</div>` : ''}
-    ${post.imageUrl ? `<img src="${resolveImage(post.imageUrl)}" style="width:100%; border-radius:8px; margin-bottom:10px;">` : ''}
+    ${post.content ? `<div style="font-size:15px; margin-top:12px; margin-bottom:12px; white-space:pre-wrap; color:var(--text-main);">${escapeHtml(post.content)}</div>` : ''}
+    ${post.imageUrl ? `<img src="${resolveImage(post.imageUrl)}" style="width:100%; border-radius:12px; margin-bottom:12px; border:1px solid var(--card-border);">` : ''}
 
     <div class="post-stats-row">
       <div>👍 ❤️ <span class="like-count">${likesArray.length}</span></div>
@@ -161,13 +153,13 @@ function renderPostCard(post) {
     </div>
 
     <div class="post-actions-bar">
-      <button class="fb-action-btn like-btn ${liked ? 'liked' : ''}">
+      <button class="action-btn like-btn ${liked ? 'liked' : ''}">
         👍 <span>ถูกใจ</span>
       </button>
-      <button class="fb-action-btn comment-toggle-btn">
-        💬 <span>แสดงความคิดเห็น</span>
+      <button class="action-btn comment-toggle-btn">
+        💬 <span>ความคิดเห็น</span>
       </button>
-      <button class="fb-action-btn" onclick="alert('คัดลอกลิงก์โพสต์เรียบร้อยแล้ว!')">
+      <button class="action-btn" onclick="alert('คัดลอกลิงก์โพสต์เรียบร้อยแล้ว!')">
         ↗️ <span>แชร์</span>
       </button>
     </div>
@@ -243,7 +235,7 @@ function renderComments(container, comments) {
         <div class="comment-item">
           <img class="avatar-sm" src="${avatarUrl}">
           <div class="comment-bubble">
-            <a href="#" class="comment-bubble-author">${username}</a>
+            <a href="profile.html?id=${c.user ? (c.user._id || c.user.id) : ''}" class="comment-bubble-author">${username}</a>
             <div class="comment-bubble-text">${escapeHtml(c.text)}</div>
           </div>
         </div>

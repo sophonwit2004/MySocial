@@ -9,16 +9,17 @@
 <body>
 
 <div class="navbar">
-  <h1>🌌 MySocial</h1>
+  <a href="index.html" class="nav-brand">🌌 MySocial</a>
   <div class="nav-links">
-    <a href="index.html">🏠 ฟีด</a>
-    <a href="profile.html">👤 โปรไฟล์</a>
-    <button onclick="logout()">🚪 ออกจากระบบ</button>
+    <a href="index.html" class="nav-link">🏠 ฟีด</a>
+    <a href="search.html" class="nav-link active">🔍 ค้นหา</a>
+    <a href="profile.html" class="nav-link">👤 โปรไฟล์</a>
+    <button class="btn-logout" onclick="logout()">🚪 ออกจากระบบ</button>
   </div>
 </div>
 
 <div class="container">
-  <div class="search-box">
+  <div class="search-box" style="margin-bottom: 20px;">
     <input type="text" id="searchInput" placeholder="🔍 ค้นหาผู้ใช้จาก username...">
   </div>
   <div id="resultsList" class="card"></div>
