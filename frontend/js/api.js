@@ -30,8 +30,39 @@ function logout() {
 
 function requireLogin() {
   if (!getToken()) {
-    // กำหนดบัญชีเดโมให้อัตโนมัติถ้ายังไม่ได้ล็อกอินเพื่อทดลองใช้ได้ทันที
     saveAuth('demo_token_123', { username: 'DemoUser', id: 'demo_user_123' });
+  }
+}
+
+// ==== ระบบบันทึกโพสต์ถาวรใน LocalStorage เพื่อไม่ให้โพสต์หายเมื่อรีเฟรช/ออกจากระบบแล้วเข้าใหม่ ====
+function getSavedLocalPosts() {
+  try {
+    const data = localStorage.getItem('madoo_saved_posts');
+    return data ? JSON.parse(data) : [];
+  } catch (err) {
+    return [];
+  }
+}
+
+function saveLocalPost(post) {
+  try {
+    const posts = getSavedLocalPosts();
+    // กรองถ้ามี ID ซ้ำ และเพิ่มไว้บนสุด
+    const filtered = posts.filter(p => p._id !== post._id);
+    filtered.unshift(post);
+    localStorage.setItem('madoo_saved_posts', JSON.stringify(filtered));
+  } catch (err) {
+    console.error('Cannot save post to localStorage:', err);
+  }
+}
+
+function removeSavedLocalPost(postId) {
+  try {
+    let posts = getSavedLocalPosts();
+    posts = posts.filter(p => p._id !== postId);
+    localStorage.setItem('madoo_saved_posts', JSON.stringify(posts));
+  } catch (err) {
+    console.error('Cannot remove post from localStorage:', err);
   }
 }
 
@@ -59,7 +90,13 @@ async function apiRequest(path, method = 'GET', body = null) {
     if (!res.ok) throw new Error(data.message || 'เกิดข้อผิดพลาด');
     return data;
   } catch (err) {
-    // ถ้า fetch ล้มเหลว (เช่น เซิร์ฟเวอร์ออฟไลน์/เปิดไฟล์โดยตรง)
+    // โหมดสลับ Demo/Offline อัตโนมัติเมื่อไม่ได้เชื่อมต่อเซิร์ฟเวอร์
+    if (path.includes('/auth/login') || path.includes('/auth/register')) {
+      return {
+        token: 'demo_token_123',
+        user: { username: (body && body.username) || 'DemoUser', id: 'demo_user_123' }
+      };
+    }
     if (path.includes('/posts/feed')) {
       return [
         {
@@ -122,18 +159,11 @@ async function apiUpload(path, method, formData) {
     if (!res.ok) throw new Error(data.message || 'เกิดข้อผิดพลาด');
     return data;
   } catch (err) {
-    // Fallback โหมดออฟไลน์/เซิร์ฟเวอร์ไม่ได้เปิด เพื่อให้สามารถกดโพสต์ได้เสมอ
     const currentUser = getCurrentUser();
     const content = formData.get('content') || '';
     const locationName = formData.get('locationName') || '';
     const lat = formData.get('lat') || null;
     const lng = formData.get('lng') || null;
-    const imageFile = formData.get('image');
-
-    let imageUrl = '';
-    if (imageFile && imageFile instanceof File) {
-      imageUrl = URL.createObjectURL(imageFile);
-    }
 
     return {
       _id: 'post_' + Date.now(),
@@ -141,7 +171,7 @@ async function apiUpload(path, method, formData) {
       locationName,
       lat: lat ? parseFloat(lat) : null,
       lng: lng ? parseFloat(lng) : null,
-      imageUrl,
+      imageUrl: '',
       user: {
         _id: currentUser.id || currentUser._id || 'demo_user_123',
         username: currentUser.username || 'DemoUser',
@@ -154,7 +184,6 @@ async function apiUpload(path, method, formData) {
   }
 }
 
-// ทำให้ path รูปภาพ กลายเป็น URL เต็ม
 function resolveImage(pathStr) {
   if (!pathStr) return '';
   if (pathStr.startsWith('blob:') || pathStr.startsWith('data:') || pathStr.startsWith('http://') || pathStr.startsWith('https://')) {

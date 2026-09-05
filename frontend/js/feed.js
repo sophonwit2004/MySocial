@@ -220,6 +220,16 @@ if (submitPostBtn) {
     submitPostBtn.textContent = 'กำลังโพสต์...';
 
     try {
+      // แปลงรูปภาพเป็น Base64 Data URL เพื่อให้เก็บได้ถาวรข้ามการล็อกอินและรีเฟรช
+      let imageBase64 = '';
+      if (selectedImageFile) {
+        imageBase64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.readAsDataURL(selectedImageFile);
+        });
+      }
+
       const formData = new FormData();
       formData.append('content', content);
       if (locationName) formData.append('locationName', locationName);
@@ -228,6 +238,13 @@ if (submitPostBtn) {
       if (selectedImageFile) formData.append('image', selectedImageFile);
 
       const newPost = await apiUpload('/posts', 'POST', formData);
+
+      if (imageBase64 && (!newPost.imageUrl || newPost.imageUrl.startsWith('blob:'))) {
+        newPost.imageUrl = imageBase64;
+      }
+
+      // บันทึกลง LocalStorage ถาวร
+      saveLocalPost(newPost);
 
       // ล้างฟอร์ม
       if (postContentElem) postContentElem.value = '';
@@ -260,21 +277,39 @@ async function loadFeed() {
   const feedContainer = document.getElementById('feedContainer');
   const feedEmpty = document.getElementById('feedEmpty');
 
+  let serverPosts = [];
   try {
-    const posts = await apiRequest('/posts/feed');
-    allPostsList = posts || [];
-
-    if (!allPostsList || allPostsList.length === 0) {
-      if (feedEmpty) feedEmpty.style.display = 'block';
-      return;
-    }
-    if (feedEmpty) feedEmpty.style.display = 'none';
-
-    renderFeedWithSorting();
-    updateMapMarkers(allPostsList);
+    serverPosts = await apiRequest('/posts/feed');
   } catch (err) {
-    if (feedContainer) feedContainer.innerHTML = `<p class="error-msg">${err.message}</p>`;
+    serverPosts = [];
   }
+
+  const localSavedPosts = getSavedLocalPosts();
+
+  // รวมโพสต์จากทั้ง LocalStorage และ Server โดยกรอง ID ที่ซ้ำกัน
+  const postsMap = new Map();
+
+  (localSavedPosts || []).forEach((p) => {
+    if (p && p._id) postsMap.set(p._id, p);
+  });
+
+  (serverPosts || []).forEach((p) => {
+    if (p && p._id && !postsMap.has(p._id)) {
+      postsMap.set(p._id, p);
+    }
+  });
+
+  allPostsList = Array.from(postsMap.values());
+  allPostsList.sort((a, b) => new Date(b.createdAt || Date.now()) - new Date(a.createdAt || Date.now()));
+
+  if (!allPostsList || allPostsList.length === 0) {
+    if (feedEmpty) feedEmpty.style.display = 'block';
+    return;
+  }
+  if (feedEmpty) feedEmpty.style.display = 'none';
+
+  renderFeedWithSorting();
+  updateMapMarkers(allPostsList);
 }
 
 // กรองและเรียงโพสต์
@@ -430,6 +465,7 @@ function renderPostCard(post) {
       try {
         await apiRequest(`/posts/${post._id}`, 'DELETE');
       } catch (err) {}
+      removeSavedLocalPost(post._id);
       allPostsList = allPostsList.filter(p => p._id !== post._id);
       renderFeedWithSorting();
       updateMapMarkers(allPostsList);

@@ -71,15 +71,37 @@ document.getElementById('saveProfileBtn')?.addEventListener('click', async () =>
 
 async function loadUserPosts() {
   const container = document.getElementById('userPosts');
-  const posts = await apiRequest(`/posts/user/${profileId}`);
+  let serverPosts = [];
+  try {
+    serverPosts = await apiRequest(`/posts/user/${profileId}`);
+  } catch (err) {
+    serverPosts = [];
+  }
+
+  const localSavedPosts = getSavedLocalPosts();
+  const postsMap = new Map();
+
+  (localSavedPosts || []).forEach((p) => {
+    if (p && p._id) postsMap.set(p._id, p);
+  });
+
+  (serverPosts || []).forEach((p) => {
+    if (p && p._id && !postsMap.has(p._id)) {
+      postsMap.set(p._id, p);
+    }
+  });
+
+  const mergedPosts = Array.from(postsMap.values());
+  mergedPosts.sort((a, b) => new Date(b.createdAt || Date.now()) - new Date(a.createdAt || Date.now()));
+
   container.innerHTML = '';
 
-  if (!posts || posts.length === 0) {
+  if (!mergedPosts || mergedPosts.length === 0) {
     container.innerHTML = '<p class="text-muted" style="text-align:center">ยังไม่มีโพสต์</p>';
     return;
   }
 
-  posts.forEach((post) => container.appendChild(renderSimplePost(post)));
+  mergedPosts.forEach((post) => container.appendChild(renderSimplePost(post)));
 }
 
 function renderSimplePost(post) {
@@ -102,6 +124,7 @@ function renderSimplePost(post) {
       try {
         await apiRequest(`/posts/${post._id}`, 'DELETE');
       } catch (err) {}
+      removeSavedLocalPost(post._id);
       card.remove();
     });
   }
