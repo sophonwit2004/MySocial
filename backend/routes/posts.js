@@ -7,46 +7,55 @@ const upload = require('../middleware/upload');
 
 const router = express.Router();
 
-// In-Memory storage สำหรับ Demo mode บน Vercel พร้อมข่าวสารตั้งต้นเสมือนจริง
+// In-Memory storage สำหรับ Demo mode บน Vercel พร้อมสถานที่ท่องเที่ยวจริงในไทย
 let memoryPosts = [
   {
     _id: 'news_post_1',
-    content: '🚀 ข่าวอัปเดตไอที: วงการปัญญาประดิษฐ์ (AI) ในปี 2026 ก้าวหน้าไปอีกขั้น! วิศวกรเปิดตัวโมเดลใหม่ที่สามารถช่วยพัฒนาซอฟต์แวร์ได้อย่างรวดเร็วและแม่นยำสูง 💻✨ #TechNews #Innovation',
-    imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80',
+    content: '🛕 ชมความสวยงามของ "วัดสิรินธรวรารามภูพร้าว" (วัดเรืองแสง) อ.สิรินธร จ.อุบลราชธานี ยามเย็นสวยตระการตามากครับ! 🌟✨ #TravelThailand #UbonRatchathani #MADOO',
+    imageUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&q=80',
+    locationName: 'วัดสิรินธรวรารามภูพร้าว (วัดเรืองแสง), อุบลราชธานี',
+    lat: 15.2286,
+    lng: 104.8563,
     user: { 
-      _id: 'tech_news_id', 
-      username: 'Tech News Thailand', 
-      profilePic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80' 
+      _id: 'travel_world_id', 
+      username: 'Travel World 🧳', 
+      profilePic: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80' 
     },
     likes: ['demo_user_123', 'u2', 'u3'],
     comments: [
-      { _id: 'c101', text: 'น่าสนใจมากครับ ยุคนี้ AI มาแรงจริงๆ', user: { username: 'Dev_Sonic', profilePic: '' } },
-      { _id: 'c102', text: 'อยากลองใช้งานเลยครับ 🚀', user: { username: 'GamerTH', profilePic: '' } }
+      { _id: 'c101', text: 'บรรยากาศยามเย็นเรืองแสงสวยงามมากครับ!', user: { username: 'Dev_Sonic', profilePic: '' } },
+      { _id: 'c102', text: 'เคยกดปุ่มนำทางไปมาแล้ว เดินทางสะดวกมาก 🗺️✨', user: { username: 'Ploy_Traveler', profilePic: '' } }
     ],
     createdAt: new Date(Date.now() - 3600000 * 2).toISOString()
   },
   {
     _id: 'news_post_2',
-    content: '🏔️ บรรยากาศธรรมชาติยามเช้า อากาศบริสุทธิ์และหมอกหนาๆ สดชื่นสุดๆ สำหรับวันพักผ่อนสัปดาห์นี้ครับ 🌿📸 #TravelThailand #Nature',
+    content: '🏔️ ประตูท่าแพ เชียงใหม่ อากาศยามเช้าเย็นสบาย ถ่ายรูปกับฝูงนกพิราบและกำแพงเมืองโบราณอันเป็นเอกลักษณ์ 📸🕊️ #ChiangMai #ThaPhaeGate',
     imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&q=80',
+    locationName: 'ประตูท่าแพ, เชียงใหม่',
+    lat: 18.7877,
+    lng: 98.9931,
     user: { 
-      _id: 'travel_world_id', 
-      username: 'Travel World', 
-      profilePic: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80' 
+      _id: 'chiangmai_explorer', 
+      username: 'Chiang Mai Explorer 🍃', 
+      profilePic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80' 
     },
     likes: ['u1', 'u2'],
     comments: [
-      { _id: 'c201', text: 'สวยมากครับ ถ่ายที่ไหนครับเนี่ย?', user: { username: 'Ploy_Traveler', profilePic: '' } }
+      { _id: 'c201', text: 'ไปเชียงใหม่ทีไรต้องแวะที่นี่ทุกครั้งครับ!', user: { username: 'Ploy_Traveler', profilePic: '' } }
     ],
     createdAt: new Date(Date.now() - 3600000 * 5).toISOString()
   },
   {
     _id: 'news_post_3',
-    content: '🎉 ยินดีต้อนรับสู่ฟีดข่าว facebook (MySocial)! คุณสามารถพิมพ์ข้อความ แนบรูปภาพ กดไลก์ คอมเมนต์ และแชร์ได้ตามต้องการครับ 💙',
-    imageUrl: '',
+    content: '🌅 แหลมพรหมเทพ ภูเก็ต จุดชมพระอาทิตย์ตกดินที่สวยที่สุดในประเทศไทย ลมทะเลเย็นสบาย 🌊☀️ #Phuket #PhromthepCape',
+    imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80',
+    locationName: 'แหลมพรหมเทพ, ภูเก็ต',
+    lat: 7.7607,
+    lng: 98.3054,
     user: { 
-      _id: 'admin_official', 
-      username: 'Facebook Community', 
+      _id: 'island_hopper', 
+      username: 'Phuket Hopper 🏖️', 
       profilePic: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80' 
     },
     likes: ['demo_user_123'],
@@ -64,7 +73,7 @@ function getFileUrl(file) {
   return '/uploads/' + file.filename;
 }
 
-// สร้างโพสต์ใหม่ (ข้อความ + รูปภาพ ถ้ามี)
+// สร้างโพสต์ใหม่ (ข้อความ + รูปภาพ + พิกัดนำทาง)
 router.post('/', authMiddleware, (req, res, next) => {
   upload.single('image')(req, res, (err) => {
     if (err) {
@@ -74,18 +83,23 @@ router.post('/', authMiddleware, (req, res, next) => {
   });
 }, async (req, res) => {
   try {
-    const { content } = req.body;
+    const { content, locationName, lat, lng } = req.body;
     if (!content && !req.file) {
       return res.status(400).json({ message: 'ต้องมีข้อความหรือรูปภาพอย่างน้อยหนึ่งอย่าง' });
     }
 
     const imageUrl = getFileUrl(req.file);
+    const latitude = lat ? parseFloat(lat) : null;
+    const longitude = lng ? parseFloat(lng) : null;
 
     if (mongoose.connection.readyState === 1) {
       const newPost = await Post.create({
         user: req.userId,
         content: content || '',
         imageUrl,
+        locationName: locationName || '',
+        lat: latitude,
+        lng: longitude
       });
       const populatedPost = await newPost.populate('user', 'username profilePic');
       return res.status(201).json(populatedPost);
@@ -96,6 +110,9 @@ router.post('/', authMiddleware, (req, res, next) => {
       _id: 'post_' + Date.now(),
       content: content || '',
       imageUrl,
+      locationName: locationName || '',
+      lat: latitude,
+      lng: longitude,
       user: { _id: req.userId || 'demo_user_123', username: 'DemoUser', profilePic: '' },
       likes: [],
       comments: [],

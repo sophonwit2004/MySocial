@@ -7,17 +7,135 @@ document.getElementById('myAvatar').src = currentUser.profilePic
   ? resolveImage(currentUser.profilePic)
   : 'https://ui-avatars.com/api/?name=' + currentUser.username;
 
-if (document.getElementById('sidebarUsername')) {
-  document.getElementById('sidebarUsername').textContent = currentUser.username;
-}
-if (document.getElementById('sidebarAvatar')) {
-  document.getElementById('sidebarAvatar').src = currentUser.profilePic
-    ? resolveImage(currentUser.profilePic)
-    : 'https://ui-avatars.com/api/?name=' + currentUser.username;
+// โกลบอลสเตตสำหรับ Leaflet Map, โพสต์ทั้งหมด และ พิกัด GPS ผู้ใช้
+let map = null;
+let markersGroup = null;
+let allPostsList = [];
+let userCurrentCoords = null; // { lat, lng }
+
+// เริ่มต้น Leaflet.js Map
+function initMap() {
+  if (typeof L === 'undefined') return;
+  
+  // ตำแหน่งเริ่มต้น: ประเทศไทย
+  map = L.map('mainMap').setView([13.7367, 100.5231], 6);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  markersGroup = L.layerGroup().addTo(map);
 }
 
+// อัปเดตหมุดสถานที่บนแผนที่
+function updateMapMarkers(posts) {
+  if (!map || !markersGroup) return;
+  markersGroup.clearLayers();
+
+  const bounds = [];
+
+  posts.forEach((post) => {
+    if (post.lat && post.lng) {
+      const lat = parseFloat(post.lat);
+      const lng = parseFloat(post.lng);
+      bounds.push([lat, lng]);
+
+      const navUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+      const popupContent = `
+        <div style="font-family:sans-serif; text-align:center; padding:4px;">
+          <strong style="font-size:14px; color:#1e293b;">${escapeHtml(post.locationName || 'สถานที่ท่องเที่ยว')}</strong>
+          <p style="font-size:12px; color:#64748b; margin:4px 0;">โพสต์โดย: ${escapeHtml(post.user ? post.user.username : 'User')}</p>
+          <a href="${navUrl}" target="_blank" style="display:inline-block; margin-top:6px; background:#10b981; color:#fff; padding:6px 12px; border-radius:6px; font-size:12px; text-decoration:none; font-weight:bold;">
+            🧭 นำทางไปที่นี่ (Google Maps)
+          </a>
+        </div>
+      `;
+
+      L.marker([lat, lng])
+        .addTo(markersGroup)
+        .bindPopup(popupContent);
+    }
+  });
+
+  if (bounds.length > 0) {
+    map.fitBounds(bounds, { padding: [40, 40] });
+  }
+}
+
+// Preset Location Selector
+const presetSelect = document.getElementById('presetLocationSelect');
+const locationNameInput = document.getElementById('locationNameInput');
+const latInput = document.getElementById('latInput');
+const lngInput = document.getElementById('lngInput');
+
+presetSelect.addEventListener('change', () => {
+  const val = presetSelect.value;
+  if (!val) return;
+  const parts = val.split('|');
+  if (parts.length === 3) {
+    locationNameInput.value = parts[0];
+    latInput.value = parts[1];
+    lngInput.value = parts[2];
+  }
+});
+
+// ดึงพิกัด GPS ผู้ใช้จาก Browser Geolocation API
+function getUserLocation(onSuccess) {
+  if (!navigator.geolocation) {
+    alert('เบราว์เซอร์ของคุณไม่รองรับการดึงตำแหน่ง GPS');
+    return;
+  }
+
+  const statusSpan = document.getElementById('userLocationStatus');
+  statusSpan.textContent = '⏳ กำลังค้นหาตำแหน่ง GPS...';
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      userCurrentCoords = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      };
+      statusSpan.textContent = `📍 ${userCurrentCoords.lat.toFixed(4)}, ${userCurrentCoords.lng.toFixed(4)}`;
+      if (onSuccess) onSuccess(userCurrentCoords);
+      renderFeedWithSorting();
+    },
+    (err) => {
+      statusSpan.textContent = '❌ ไม่สามารถดึงตำแหน่งได้';
+      alert('ไม่สามารถดึงตำแหน่ง GPS ได้: ' + err.message);
+    }
+  );
+}
+
+document.getElementById('getGpsBtn').addEventListener('click', () => {
+  getUserLocation((coords) => {
+    latInput.value = coords.lat.toFixed(6);
+    lngInput.value = coords.lng.toFixed(6);
+    locationNameInput.value = 'ตำแหน่งปัจจุบันของฉัน';
+  });
+});
+
+document.getElementById('calcDistanceBtn').addEventListener('click', () => {
+  getUserLocation();
+});
+
+// คำนวณระยะทางจากสูตร Haversine (กิโลเมตร)
+function calculateDistanceKm(lat1, lon1, lat2, lon2) {
+  const R = 6371; // รัศมีโลกใน กิโลเมตร
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) *
+      Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+// การจัดการการเลือกรูปภาพ
 let selectedImageFile = null;
-
 const postImageInput = document.getElementById('postImage');
 const imagePreviewContainer = document.getElementById('imagePreviewContainer');
 const imagePreview = document.getElementById('imagePreview');
@@ -43,15 +161,20 @@ removeImageBtn.addEventListener('click', () => {
   imagePreviewContainer.style.display = 'none';
 });
 
+// ส่งโพสต์ใหม่
 document.getElementById('submitPostBtn').addEventListener('click', async () => {
   const content = document.getElementById('postContent').value.trim();
+  const locationName = locationNameInput.value.trim();
+  const lat = latInput.value.trim();
+  const lng = lngInput.value.trim();
+
   const errorBox = document.getElementById('postError');
   const submitBtn = document.getElementById('submitPostBtn');
   errorBox.textContent = '';
   errorBox.style.display = 'none';
 
-  if (!content && !selectedImageFile) {
-    errorBox.textContent = 'กรุณาพิมพ์ข้อความหรือแนบรูปภาพ';
+  if (!content && !selectedImageFile && !locationName) {
+    errorBox.textContent = 'กรุณากรอกข้อความ แนบรูปภาพ หรือระบุสถานที่ท่องเที่ยว';
     errorBox.style.display = 'block';
     return;
   }
@@ -62,24 +185,27 @@ document.getElementById('submitPostBtn').addEventListener('click', async () => {
   try {
     const formData = new FormData();
     formData.append('content', content);
+    if (locationName) formData.append('locationName', locationName);
+    if (lat) formData.append('lat', lat);
+    if (lng) formData.append('lng', lng);
     if (selectedImageFile) formData.append('image', selectedImageFile);
 
     const newPost = await apiUpload('/posts', 'POST', formData);
 
     // ล้างฟอร์ม
     document.getElementById('postContent').value = '';
+    locationNameInput.value = '';
+    latInput.value = '';
+    lngInput.value = '';
+    presetSelect.value = '';
     postImageInput.value = '';
     selectedImageFile = null;
     imagePreview.src = '';
     imagePreviewContainer.style.display = 'none';
 
-    // เพิ่มโพสต์ใหม่ไว้บนสุดของฟีดทันที
-    const feedContainer = document.getElementById('feedContainer');
-    const feedEmpty = document.getElementById('feedEmpty');
-    feedEmpty.style.display = 'none';
-
-    const card = renderPostCard(newPost);
-    feedContainer.prepend(card);
+    allPostsList.unshift(newPost);
+    renderFeedWithSorting();
+    updateMapMarkers(allPostsList);
   } catch (err) {
     errorBox.textContent = err.message;
     errorBox.style.display = 'block';
@@ -89,26 +215,64 @@ document.getElementById('submitPostBtn').addEventListener('click', async () => {
   }
 });
 
+// โหลดฟีดข้อมูล
 async function loadFeed() {
   const feedContainer = document.getElementById('feedContainer');
   const feedEmpty = document.getElementById('feedEmpty');
 
   try {
     const posts = await apiRequest('/posts/feed');
-    feedContainer.innerHTML = '';
+    allPostsList = posts || [];
 
-    if (!posts || posts.length === 0) {
+    if (!allPostsList || allPostsList.length === 0) {
       feedEmpty.style.display = 'block';
       return;
     }
     feedEmpty.style.display = 'none';
 
-    posts.forEach((post) => {
-      feedContainer.appendChild(renderPostCard(post));
-    });
+    renderFeedWithSorting();
+    updateMapMarkers(allPostsList);
   } catch (err) {
     feedContainer.innerHTML = `<p class="error-msg">${err.message}</p>`;
   }
+}
+
+// กรองและเรียงโพสต์
+document.getElementById('sortOrderSelect').addEventListener('change', () => {
+  renderFeedWithSorting();
+});
+
+function renderFeedWithSorting() {
+  const feedContainer = document.getElementById('feedContainer');
+  const feedEmpty = document.getElementById('feedEmpty');
+  const sortMode = document.getElementById('sortOrderSelect').value;
+
+  let displayPosts = [...allPostsList];
+
+  if (sortMode === 'distance') {
+    if (!userCurrentCoords) {
+      alert('กำลังค้นหาพิกัด GPS เพื่อเรียงลำดับสถานที่ใกล้คุณที่สุด...');
+      getUserLocation();
+      return;
+    }
+
+    displayPosts.sort((a, b) => {
+      const distA = a.lat && a.lng ? calculateDistanceKm(userCurrentCoords.lat, userCurrentCoords.lng, parseFloat(a.lat), parseFloat(a.lng)) : 99999;
+      const distB = b.lat && b.lng ? calculateDistanceKm(userCurrentCoords.lat, userCurrentCoords.lng, parseFloat(b.lat), parseFloat(b.lng)) : 99999;
+      return distA - distB;
+    });
+  }
+
+  feedContainer.innerHTML = '';
+  if (displayPosts.length === 0) {
+    feedEmpty.style.display = 'block';
+    return;
+  }
+  feedEmpty.style.display = 'none';
+
+  displayPosts.forEach((post) => {
+    feedContainer.appendChild(renderPostCard(post));
+  });
 }
 
 function renderPostCard(post) {
@@ -125,6 +289,27 @@ function renderPostCard(post) {
   const userId = post.user ? (post.user._id || post.user.id) : '';
 
   const canDelete = !userId || userId === currentUserId || currentUserId.startsWith('demo') || userId.startsWith('demo');
+
+  // คำนวณระยะทางถ้ามีพิกัด
+  let distanceText = '';
+  let navButtonHtml = '';
+
+  if (post.lat && post.lng) {
+    const lat = parseFloat(post.lat);
+    const lng = parseFloat(post.lng);
+    const googleNavUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+
+    if (userCurrentCoords) {
+      const km = calculateDistanceKm(userCurrentCoords.lat, userCurrentCoords.lng, lat, lng);
+      distanceText = `<span class="post-distance-badge">📍 ห่างจากคุณ ${km.toFixed(1)} กม.</span>`;
+    }
+
+    navButtonHtml = `
+      <a href="${googleNavUrl}" target="_blank" class="btn-navigate">
+        🧭 นำทางไปที่นี่ (Google Maps)
+      </a>
+    `;
+  }
 
   card.innerHTML = `
     <div class="post-header">
@@ -144,8 +329,18 @@ function renderPostCard(post) {
       ${canDelete ? `<button class="delete-btn icon-circle-btn" style="width:34px; height:34px; font-size:14px;" title="ลบโพสต์">🗑️</button>` : ''}
     </div>
 
-    ${post.content ? `<div style="font-size:15px; margin-top:12px; margin-bottom:12px; white-space:pre-wrap; color:var(--text-main);">${escapeHtml(post.content)}</div>` : ''}
+    ${post.locationName ? `
+      <div style="margin-top:8px;">
+        <div class="post-location-badge">
+          📍 ${escapeHtml(post.locationName)} ${distanceText}
+        </div>
+      </div>
+    ` : ''}
+
+    ${post.content ? `<div style="font-size:15px; margin-top:8px; margin-bottom:12px; white-space:pre-wrap; color:var(--text-main);">${escapeHtml(post.content)}</div>` : ''}
     ${post.imageUrl ? `<img src="${resolveImage(post.imageUrl)}" style="width:100%; border-radius:12px; margin-bottom:12px; border:1px solid var(--card-border);">` : ''}
+
+    ${navButtonHtml}
 
     <div class="post-stats-row">
       <div>👍 ❤️ <span class="like-count">${likesArray.length}</span></div>
@@ -159,7 +354,7 @@ function renderPostCard(post) {
       <button class="action-btn comment-toggle-btn">
         💬 <span>ความคิดเห็น</span>
       </button>
-      <button class="action-btn" onclick="alert('คัดลอกลิงก์โพสต์เรียบร้อยแล้ว!')">
+      <button class="action-btn" onclick="alert('คัดลอกลิงก์สถานที่โพสต์เรียบร้อยแล้ว!')">
         ↗️ <span>แชร์</span>
       </button>
     </div>
@@ -191,7 +386,9 @@ function renderPostCard(post) {
       try {
         await apiRequest(`/posts/${post._id}`, 'DELETE');
       } catch (err) {}
-      card.remove();
+      allPostsList = allPostsList.filter(p => p._id !== post._id);
+      renderFeedWithSorting();
+      updateMapMarkers(allPostsList);
     });
   }
 
@@ -251,4 +448,5 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+initMap();
 loadFeed();

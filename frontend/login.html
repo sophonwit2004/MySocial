@@ -51,7 +51,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   try {
     const data = await apiRequest('/auth/login', 'POST', { email, password });
     saveAuth(data.token, data.user);
-    window.location.href = 'profile.html';
+    window.location.href = 'index.html';
   } catch (err) {
     errorMsg.textContent = err.message;
     errorMsg.style.display = 'block';
@@ -81,7 +81,7 @@ document.getElementById('demoLoginBtn').addEventListener('click', async () => {
       });
     }
     saveAuth(data.token, data.user);
-    window.location.href = 'profile.html';
+    window.location.href = 'index.html';
   } catch (err) {
     errorMsg.style.color = 'var(--accent-pink)';
     errorMsg.textContent = err.message;

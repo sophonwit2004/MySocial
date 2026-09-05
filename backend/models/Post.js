@@ -5,6 +5,9 @@ const postSchema = new mongoose.Schema(
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     content: { type: String, default: '', maxlength: 2000 },
     imageUrl: { type: String, default: '' }, // path ของรูปที่แนบกับโพสต์
+    locationName: { type: String, default: '' },
+    lat: { type: Number, default: null },
+    lng: { type: Number, default: null },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     comments: [
       {
