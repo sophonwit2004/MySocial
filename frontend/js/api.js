@@ -1,7 +1,9 @@
 // ==== ตั้งค่า URL ของ backend ====
 // ตอนรันบนเครื่องตัวเอง ให้ใช้ localhost
 // ตอน deploy จริง ให้เปลี่ยนเป็น URL ของ backend ที่ deploy ไว้ เช่น https://your-backend.onrender.com
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = window.location.origin.includes('localhost')
+  ? 'http://localhost:5000/api'
+  : '/api';
 
 function getToken() {
   return localStorage.getItem('token');
