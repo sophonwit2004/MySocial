@@ -1,6 +1,4 @@
 // ==== ตั้งค่า URL ของ backend ====
-// ตอนรันบนเครื่องตัวเอง ให้ใช้ localhost
-// ตอน deploy จริง ให้เปลี่ยนเป็น URL ของ backend ที่ deploy ไว้ เช่น https://your-backend.onrender.com
 const API_BASE = window.location.origin.includes('localhost')
   ? 'http://localhost:5000/api'
   : '/api';
@@ -43,7 +41,14 @@ async function apiRequest(path, method = 'GET', body = null) {
     body: body ? JSON.stringify(body) : null,
   });
 
-  const data = await res.json();
+  const text = await res.text();
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch (err) {
+    throw new Error('เกิดข้อผิดพลาดจากระบบ (Server Error)');
+  }
+
   if (!res.ok) throw new Error(data.message || 'เกิดข้อผิดพลาด');
   return data;
 }
@@ -60,14 +65,24 @@ async function apiUpload(path, method, formData) {
     body: formData,
   });
 
-  const data = await res.json();
+  const text = await res.text();
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch (err) {
+    throw new Error('เกิดข้อผิดพลาดขณะอัปโหลดไฟล์ (Server Error)');
+  }
+
   if (!res.ok) throw new Error(data.message || 'เกิดข้อผิดพลาด');
   return data;
 }
 
-// ทำให้ path รูปภาพ (เช่น /uploads/xxx.jpg) กลายเป็น URL เต็ม
+// ทำให้ path รูปภาพ (เช่น /uploads/xxx.jpg หรือ data:image/...) กลายเป็น URL เต็ม
 function resolveImage(pathStr) {
   if (!pathStr) return '';
+  if (pathStr.startsWith('data:') || pathStr.startsWith('http://') || pathStr.startsWith('https://')) {
+    return pathStr;
+  }
   const base = API_BASE.replace('/api', '');
   return base + pathStr;
 }

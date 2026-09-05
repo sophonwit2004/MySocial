@@ -7,19 +7,38 @@ const upload = require('../middleware/upload');
 
 const router = express.Router();
 
+// Helper สำหรับแปลงรูปเป็น URL หรือ Base64
+function getFileUrl(file) {
+  if (!file) return '';
+  if (file.buffer) {
+    const mime = file.mimetype || 'image/jpeg';
+    return `data:${mime};base64,${file.buffer.toString('base64')}`;
+  }
+  return '/uploads/' + file.filename;
+}
+
 // สร้างโพสต์ใหม่ (ข้อความ + รูปภาพ ถ้ามี)
-router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
+router.post('/', authMiddleware, (req, res, next) => {
+  upload.single('image')(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ message: err.message || 'อัปโหลดรูปภาพไม่สำเร็จ' });
+    }
+    next();
+  });
+}, async (req, res) => {
   try {
     const { content } = req.body;
     if (!content && !req.file) {
       return res.status(400).json({ message: 'ต้องมีข้อความหรือรูปภาพอย่างน้อยหนึ่งอย่าง' });
     }
 
+    const imageUrl = getFileUrl(req.file);
+
     if (mongoose.connection.readyState === 1) {
       const newPost = await Post.create({
         user: req.userId,
         content: content || '',
-        imageUrl: req.file ? '/uploads/' + req.file.filename : '',
+        imageUrl,
       });
       const populatedPost = await newPost.populate('user', 'username profilePic');
       return res.status(201).json(populatedPost);
@@ -29,13 +48,14 @@ router.post('/', authMiddleware, upload.single('image'), async (req, res) => {
     return res.status(201).json({
       _id: 'post_' + Date.now(),
       content: content || '',
-      imageUrl: req.file ? '/uploads/' + req.file.filename : '',
+      imageUrl,
       user: { _id: req.userId || 'demo_user_123', username: 'DemoUser', profilePic: '' },
       likes: [],
       comments: [],
       createdAt: new Date().toISOString()
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: 'สร้างโพสต์ไม่สำเร็จ' });
   }
 });

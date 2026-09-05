@@ -6,6 +6,15 @@ const upload = require('../middleware/upload');
 
 const router = express.Router();
 
+function getFileUrl(file) {
+  if (!file) return '';
+  if (file.buffer) {
+    const mime = file.mimetype || 'image/jpeg';
+    return `data:${mime};base64,${file.buffer.toString('base64')}`;
+  }
+  return '/uploads/' + file.filename;
+}
+
 // ดูข้อมูลผู้ใช้คนที่ล็อกอินอยู่ (ตัวเอง)
 router.get('/me', authMiddleware, async (req, res) => {
   if (mongoose.connection.readyState === 1) {
@@ -60,23 +69,33 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 // แก้ไขโปรไฟล์ตัวเอง (bio, รูปโปรไฟล์)
-router.put('/me', authMiddleware, upload.single('profilePic'), async (req, res) => {
-  if (mongoose.connection.readyState === 1) {
-    try {
-      const updateData = {};
-      if (req.body.bio !== undefined) updateData.bio = req.body.bio;
-      if (req.file) updateData.profilePic = '/uploads/' + req.file.filename;
+router.put('/me', authMiddleware, (req, res, next) => {
+  upload.single('profilePic')(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ message: err.message || 'อัปโหลดรูปภาพไม่สำเร็จ' });
+    }
+    next();
+  });
+}, async (req, res) => {
+  try {
+    const updateData = {};
+    if (req.body.bio !== undefined) updateData.bio = req.body.bio;
+    if (req.file) updateData.profilePic = getFileUrl(req.file);
 
+    if (mongoose.connection.readyState === 1) {
       const updatedUser = await User.findByIdAndUpdate(req.userId, updateData, { new: true }).select('-password');
       return res.json(updatedUser);
-    } catch (err) {}
+    }
+
+    res.json({
+      _id: req.userId || 'demo_user_123',
+      username: 'DemoUser',
+      bio: req.body.bio || 'ยินดีต้อนรับสู่ MySocial!',
+      profilePic: req.file ? getFileUrl(req.file) : '',
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'แก้ไขโปรไฟล์ไม่สำเร็จ' });
   }
-  res.json({
-    _id: req.userId || 'demo_user_123',
-    username: 'DemoUser',
-    bio: req.body.bio || 'ยินดีต้อนรับสู่ MySocial!',
-    profilePic: req.file ? '/uploads/' + req.file.filename : '',
-  });
 });
 
 // ติดตาม / เลิกติดตาม ผู้ใช้คนอื่น (toggle)
