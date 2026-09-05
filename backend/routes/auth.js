@@ -1,13 +1,21 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 const User = require('../models/User');
 
 const router = express.Router();
+const JWT_SECRET = process.env.JWT_SECRET || 'mysocialapp_secret_key_2026_super_secure';
 
 // สมัครสมาชิก
 router.post('/register', async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(500).json({
+        message: 'ยังไม่ได้ตั้งค่า MongoDB ใน Vercel (กรุณาตั้งตัวแปร MONGODB_URI ใน Vercel Settings)'
+      });
+    }
+
     const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
@@ -28,7 +36,7 @@ router.post('/register', async (req, res) => {
       password: hashedPassword,
     });
 
-    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ userId: newUser._id }, JWT_SECRET, { expiresIn: '7d' });
 
     res.status(201).json({
       message: 'สมัครสมาชิกสำเร็จ',
@@ -43,13 +51,19 @@ router.post('/register', async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'เกิดข้อผิดพลาดฝั่งเซิร์ฟเวอร์' });
+    res.status(500).json({ message: err.message || 'เกิดข้อผิดพลาดฝั่งเซิร์ฟเวอร์' });
   }
 });
 
 // เข้าสู่ระบบ
 router.post('/login', async (req, res) => {
   try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(500).json({
+        message: 'ยังไม่ได้ตั้งค่า MongoDB ใน Vercel (กรุณาตั้งตัวแปร MONGODB_URI ใน Vercel Settings)'
+      });
+    }
+
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -66,7 +80,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'รหัสผ่านไม่ถูกต้อง' });
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
 
     res.json({
       message: 'เข้าสู่ระบบสำเร็จ',
@@ -81,7 +95,7 @@ router.post('/login', async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'เกิดข้อผิดพลาดฝั่งเซิร์ฟเวอร์' });
+    res.status(500).json({ message: err.message || 'เกิดข้อผิดพลาดฝั่งเซิร์ฟเวอร์' });
   }
 });
 

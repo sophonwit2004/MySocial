@@ -18,25 +18,29 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // เชื่อมต่อฐานข้อมูล MongoDB
 async function connectDatabase() {
+  if (mongoose.connection.readyState === 1) return;
   try {
     if (process.env.MONGODB_URI) {
-      try {
-        await mongoose.connect(process.env.MONGODB_URI, { serverSelectionTimeoutMS: 3000 });
-        console.log('เชื่อมต่อ MongoDB สำเร็จ');
-        return;
-      } catch (err) {
-        console.log('ไม่พบ MongoDB ในเครื่อง กำลังสลับไปใช้ In-Memory MongoDB...');
-      }
+      await mongoose.connect(process.env.MONGODB_URI, { serverSelectionTimeoutMS: 5000 });
+      console.log('เชื่อมต่อ MongoDB สำเร็จ');
+      return;
     }
-    const { MongoMemoryServer } = require('mongodb-memory-server');
-    const mongoServer = await MongoMemoryServer.create();
-    await mongoose.connect(mongoServer.getUri());
-    console.log('เชื่อมต่อ In-Memory MongoDB สำเร็จ!');
+    if (!process.env.VERCEL) {
+      const { MongoMemoryServer } = require('mongodb-memory-server');
+      const mongoServer = await MongoMemoryServer.create();
+      await mongoose.connect(mongoServer.getUri());
+      console.log('เชื่อมต่อ In-Memory MongoDB สำเร็จ!');
+    }
   } catch (err) {
     console.error('เชื่อมต่อ MongoDB ไม่สำเร็จ:', err.message);
   }
 }
 connectDatabase();
+
+app.use(async (req, res, next) => {
+  await connectDatabase();
+  next();
+});
 
 // เส้นทาง API ทั้งหมด
 app.use('/api/auth', authRoutes);
