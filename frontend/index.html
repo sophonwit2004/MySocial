@@ -10,9 +10,9 @@
 <div class="navbar">
   <h1>MySocial</h1>
   <div class="nav-links">
-    <a href="search.html">ค้นหา</a>
-    <a href="profile.html" id="myProfileLink">โปรไฟล์</a>
-    <button onclick="logout()">ออกจากระบบ</button>
+    <a href="search.html">🔍 ค้นหา</a>
+    <a href="profile.html" id="myProfileLink">👤 โปรไฟล์</a>
+    <button onclick="logout()">🚪 ออกจากระบบ</button>
   </div>
 </div>
 
@@ -21,22 +21,32 @@
   <div class="card post-form">
     <div class="post-header">
       <img id="myAvatar" class="avatar" src="">
-      <strong id="myUsername"></strong>
+      <div>
+        <strong id="myUsername"></strong>
+        <div style="font-size:12px;color:#65676b">🌐 สาธารณะ</div>
+      </div>
     </div>
     <textarea id="postContent" placeholder="คุณกำลังคิดอะไรอยู่?"></textarea>
-    <div class="form-actions">
-      <label class="file-label">
-        📷 แนบรูปภาพ
+
+    <!-- พรีวิวรูปภาพที่เลือก -->
+    <div id="imagePreviewContainer" style="display:none; position:relative; margin-top:10px;">
+      <img id="imagePreview" style="max-width:100%; max-height:300px; border-radius:8px; display:block;">
+      <button type="button" id="removeImageBtn" style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.6); color:#fff; border:none; border-radius:50%; width:28px; height:28px; cursor:pointer; font-weight:bold;">✕</button>
+    </div>
+
+    <div class="form-actions" style="margin-top:12px;">
+      <label class="file-label" style="display:inline-flex; align-items:center; gap:6px; background:#e4e6eb; padding:8px 14px; border-radius:20px; font-weight:600;">
+        🖼️ เพิ่มรูปภาพ
         <input type="file" id="postImage" accept="image/*" style="display:none">
       </label>
-      <button class="btn" style="width:auto;padding:8px 20px" id="submitPostBtn">โพสต์</button>
+      <button class="btn" style="width:auto; padding:8px 24px; border-radius:20px; font-weight:bold;" id="submitPostBtn">โพสต์</button>
     </div>
     <div id="postError" class="error-msg"></div>
   </div>
 
   <div id="feedContainer"></div>
-  <div id="feedEmpty" class="text-muted" style="text-align:center; display:none;">
-    ยังไม่มีโพสต์ในฟีด ลองติดตามเพื่อนหรือโพสต์อะไรสักอย่างดูสิ
+  <div id="feedEmpty" class="text-muted" style="text-align:center; display:none; padding:40px 0;">
+    ยังไม่มีโพสต์ในฟีด พิมพ์อะไรสักอย่างในกล่องด้านบนแล้วกด "โพสต์" ได้เลยครับ!
   </div>
 
 </div>

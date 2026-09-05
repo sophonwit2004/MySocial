@@ -7,7 +7,21 @@ const upload = require('../middleware/upload');
 
 const router = express.Router();
 
-// Helper สำหรับแปลงรูปเป็น URL หรือ Base64
+// In-Memory storage สำหรับ Demo mode บน Vercel
+let memoryPosts = [
+  {
+    _id: 'demo_post_1',
+    content: '🎉 ยินดีต้อนรับสู่ MySocial! ลองพิมพ์ข้อความหรือแนบรูปภาพแล้วกด "โพสต์" ได้เลยครับ',
+    imageUrl: '',
+    user: { _id: 'admin_1', username: 'MySocial Team', profilePic: '' },
+    likes: ['demo_user_123'],
+    comments: [
+      { _id: 'c1', text: 'สวัสดีครับ ยินดีต้อนรับ!', user: { username: 'Admin' } }
+    ],
+    createdAt: new Date().toISOString()
+  }
+];
+
 function getFileUrl(file) {
   if (!file) return '';
   if (file.buffer) {
@@ -44,8 +58,8 @@ router.post('/', authMiddleware, (req, res, next) => {
       return res.status(201).json(populatedPost);
     }
 
-    // Fallback mode
-    return res.status(201).json({
+    // Fallback In-Memory Mode
+    const newMemoryPost = {
       _id: 'post_' + Date.now(),
       content: content || '',
       imageUrl,
@@ -53,7 +67,10 @@ router.post('/', authMiddleware, (req, res, next) => {
       likes: [],
       comments: [],
       createdAt: new Date().toISOString()
-    });
+    };
+
+    memoryPosts.unshift(newMemoryPost);
+    return res.status(201).json(newMemoryPost);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'สร้างโพสต์ไม่สำเร็จ' });
@@ -76,20 +93,8 @@ router.get('/feed', authMiddleware, async (req, res) => {
     } catch (err) {}
   }
 
-  // Fallback posts for Demo mode
-  return res.json([
-    {
-      _id: 'demo_post_1',
-      content: '🎉 ยินดีต้อนรับสู่ MySocial! โพสต์แรกของคุณบนเว็บแอปโซเชียลมีเดีย',
-      imageUrl: '',
-      user: { _id: 'admin_1', username: 'MySocial Team', profilePic: '' },
-      likes: ['demo_user_123'],
-      comments: [
-        { _id: 'c1', text: 'สวัสดีครับ ยินดีต้อนรับ!', user: { username: 'Admin' } }
-      ],
-      createdAt: new Date().toISOString()
-    }
-  ]);
+  // Return memoryPosts
+  return res.json(memoryPosts);
 });
 
 // ดูโพสต์ทั้งหมดของผู้ใช้คนใดคนหนึ่ง (สำหรับหน้าโปรไฟล์)
@@ -104,10 +109,11 @@ router.get('/user/:userId', authMiddleware, async (req, res) => {
     } catch (err) {}
   }
 
-  return res.json([]);
+  const userPosts = memoryPosts.filter(p => p.user._id === req.params.userId || req.params.userId === 'demo_user_123');
+  return res.json(userPosts);
 });
 
-// ลบโพสต์ (ลบได้เฉพาะโพสต์ของตัวเอง)
+// ลบโพสต์
 router.delete('/:id', authMiddleware, async (req, res) => {
   if (mongoose.connection.readyState === 1) {
     try {
@@ -122,6 +128,8 @@ router.delete('/:id', authMiddleware, async (req, res) => {
       return res.json({ message: 'ลบโพสต์สำเร็จ' });
     } catch (err) {}
   }
+
+  memoryPosts = memoryPosts.filter(p => p._id !== req.params.id);
   return res.json({ message: 'ลบโพสต์สำเร็จ' });
 });
 
@@ -144,6 +152,22 @@ router.post('/:id/like', authMiddleware, async (req, res) => {
       return res.json({ likesCount: post.likes.length, liked: !alreadyLiked });
     } catch (err) {}
   }
+
+  // Memory mode like toggle
+  const targetPost = memoryPosts.find(p => p._id === req.params.id);
+  if (targetPost) {
+    const userId = req.userId || 'demo_user_123';
+    const index = targetPost.likes.indexOf(userId);
+    let liked = false;
+    if (index > -1) {
+      targetPost.likes.splice(index, 1);
+    } else {
+      targetPost.likes.push(userId);
+      liked = true;
+    }
+    return res.json({ likesCount: targetPost.likes.length, liked });
+  }
+
   return res.json({ likesCount: 1, liked: true });
 });
 
@@ -164,11 +188,18 @@ router.post('/:id/comment', authMiddleware, async (req, res) => {
       return res.status(201).json(updatedPost.comments[updatedPost.comments.length - 1]);
     }
 
-    return res.status(201).json({
+    const newComment = {
       _id: 'comment_' + Date.now(),
       text,
       user: { username: 'DemoUser', profilePic: '' }
-    });
+    };
+
+    const targetPost = memoryPosts.find(p => p._id === req.params.id);
+    if (targetPost) {
+      targetPost.comments.push(newComment);
+    }
+
+    return res.status(201).json(newComment);
   } catch (err) {
     res.status(500).json({ message: 'คอมเมนต์ไม่สำเร็จ' });
   }
