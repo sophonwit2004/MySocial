@@ -15,6 +15,11 @@ if (document.getElementById('sidebarAvatar')) {
     ? resolveImage(currentUser.profilePic)
     : 'https://ui-avatars.com/api/?name=' + currentUser.username;
 }
+if (document.getElementById('storyUserAvatar')) {
+  document.getElementById('storyUserAvatar').src = currentUser.profilePic
+    ? resolveImage(currentUser.profilePic)
+    : 'https://ui-avatars.com/api/?name=' + currentUser.username;
+}
 
 let selectedImageFile = null;
 

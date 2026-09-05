@@ -7,18 +7,51 @@ const upload = require('../middleware/upload');
 
 const router = express.Router();
 
-// In-Memory storage สำหรับ Demo mode บน Vercel
+// In-Memory storage สำหรับ Demo mode บน Vercel พร้อมข่าวสารตั้งต้นเสมือนจริง
 let memoryPosts = [
   {
-    _id: 'demo_post_1',
-    content: '🎉 ยินดีต้อนรับสู่ MySocial! ลองพิมพ์ข้อความหรือแนบรูปภาพแล้วกด "โพสต์" ได้เลยครับ',
-    imageUrl: '',
-    user: { _id: 'admin_1', username: 'MySocial Team', profilePic: '' },
-    likes: ['demo_user_123'],
+    _id: 'news_post_1',
+    content: '🚀 ข่าวอัปเดตไอที: วงการปัญญาประดิษฐ์ (AI) ในปี 2026 ก้าวหน้าไปอีกขั้น! วิศวกรเปิดตัวโมเดลใหม่ที่สามารถช่วยพัฒนาซอฟต์แวร์ได้อย่างรวดเร็วและแม่นยำสูง 💻✨ #TechNews #Innovation',
+    imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80',
+    user: { 
+      _id: 'tech_news_id', 
+      username: 'Tech News Thailand', 
+      profilePic: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80' 
+    },
+    likes: ['demo_user_123', 'u2', 'u3'],
     comments: [
-      { _id: 'c1', text: 'สวัสดีครับ ยินดีต้อนรับ!', user: { username: 'Admin' } }
+      { _id: 'c101', text: 'น่าสนใจมากครับ ยุคนี้ AI มาแรงจริงๆ', user: { username: 'Dev_Sonic', profilePic: '' } },
+      { _id: 'c102', text: 'อยากลองใช้งานเลยครับ 🚀', user: { username: 'GamerTH', profilePic: '' } }
     ],
-    createdAt: new Date().toISOString()
+    createdAt: new Date(Date.now() - 3600000 * 2).toISOString()
+  },
+  {
+    _id: 'news_post_2',
+    content: '🏔️ บรรยากาศธรรมชาติยามเช้า อากาศบริสุทธิ์และหมอกหนาๆ สดชื่นสุดๆ สำหรับวันพักผ่อนสัปดาห์นี้ครับ 🌿📸 #TravelThailand #Nature',
+    imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&q=80',
+    user: { 
+      _id: 'travel_world_id', 
+      username: 'Travel World', 
+      profilePic: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80' 
+    },
+    likes: ['u1', 'u2'],
+    comments: [
+      { _id: 'c201', text: 'สวยมากครับ ถ่ายที่ไหนครับเนี่ย?', user: { username: 'Ploy_Traveler', profilePic: '' } }
+    ],
+    createdAt: new Date(Date.now() - 3600000 * 5).toISOString()
+  },
+  {
+    _id: 'news_post_3',
+    content: '🎉 ยินดีต้อนรับสู่ฟีดข่าว facebook (MySocial)! คุณสามารถพิมพ์ข้อความ แนบรูปภาพ กดไลก์ คอมเมนต์ และแชร์ได้ตามต้องการครับ 💙',
+    imageUrl: '',
+    user: { 
+      _id: 'admin_official', 
+      username: 'Facebook Community', 
+      profilePic: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80' 
+    },
+    likes: ['demo_user_123'],
+    comments: [],
+    createdAt: new Date(Date.now() - 3600000 * 12).toISOString()
   }
 ];
 

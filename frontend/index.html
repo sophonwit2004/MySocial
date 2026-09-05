@@ -62,6 +62,41 @@
   <!-- Middle Feed Section -->
   <div class="fb-feed-content">
 
+    <!-- Facebook Stories Bar (สตอรี่) -->
+    <div class="fb-stories-container">
+      <!-- Create Story Card -->
+      <div class="fb-story-card create-story-card" onclick="alert('สร้างสตอรี่ใหม่สำเร็จ!')">
+        <div class="create-story-top">
+          <img id="storyUserAvatar" class="story-bg" src="" style="object-fit:cover;">
+        </div>
+        <div class="create-story-bottom">
+          <div class="create-story-plus">+</div>
+          <span style="font-size:11px; font-weight:600; color:var(--fb-text); margin-top:6px;">สร้างสตอรี่</span>
+        </div>
+      </div>
+
+      <!-- Friend Story 1 -->
+      <div class="fb-story-card" onclick="alert('กำลังดูสตอรี่ของ Tech News')">
+        <img class="story-bg" src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=300&q=80">
+        <img class="story-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80">
+        <div class="story-user-name">Tech News</div>
+      </div>
+
+      <!-- Friend Story 2 -->
+      <div class="fb-story-card" onclick="alert('กำลังดูสตอรี่ของ Travel World')">
+        <img class="story-bg" src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=300&q=80">
+        <img class="story-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80">
+        <div class="story-user-name">Travel World</div>
+      </div>
+
+      <!-- Friend Story 3 -->
+      <div class="fb-story-card" onclick="alert('กำลังดูสตอรี่ของ Gaming Thailand')">
+        <img class="story-bg" src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=300&q=80">
+        <img class="story-avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80">
+        <div class="story-user-name">Gaming TH</div>
+      </div>
+    </div>
+
     <!-- Composer Box (คุณกำลังคิดอะไรอยู่?) -->
     <div class="card">
       <div class="composer-top">
@@ -121,18 +156,26 @@
 
     <div class="sidebar-menu-item">
       <div style="position:relative;">
-        <img class="sidebar-avatar" src="https://ui-avatars.com/api/?name=Admin+Facebook">
+        <img class="sidebar-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80">
         <span style="position:absolute; bottom:0; right:0; width:10px; height:10px; background:var(--fb-green); border-radius:50%; border:2px solid var(--fb-card);"></span>
       </div>
-      <span>Admin Facebook</span>
+      <span>Tech News</span>
     </div>
 
     <div class="sidebar-menu-item">
       <div style="position:relative;">
-        <img class="sidebar-avatar" src="https://ui-avatars.com/api/?name=Demo+User">
+        <img class="sidebar-avatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80">
         <span style="position:absolute; bottom:0; right:0; width:10px; height:10px; background:var(--fb-green); border-radius:50%; border:2px solid var(--fb-card);"></span>
       </div>
-      <span>Demo User</span>
+      <span>Travel World</span>
+    </div>
+
+    <div class="sidebar-menu-item">
+      <div style="position:relative;">
+        <img class="sidebar-avatar" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80">
+        <span style="position:absolute; bottom:0; right:0; width:10px; height:10px; background:var(--fb-green); border-radius:50%; border:2px solid var(--fb-card);"></span>
+      </div>
+      <span>Gaming TH</span>
     </div>
   </div>
 
