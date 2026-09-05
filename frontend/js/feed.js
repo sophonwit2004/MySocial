@@ -1,11 +1,18 @@
 requireLogin();
-const currentUser = getCurrentUser();
+const currentUser = getCurrentUser() || { username: 'DemoUser', id: 'demo_user_123' };
 const currentUserId = currentUser.id || currentUser._id || 'demo_user_123';
 
-document.getElementById('myUsername').textContent = currentUser.username;
-document.getElementById('myAvatar').src = currentUser.profilePic
-  ? resolveImage(currentUser.profilePic)
-  : 'https://ui-avatars.com/api/?name=' + currentUser.username;
+const myUsernameElem = document.getElementById('myUsername');
+if (myUsernameElem) {
+  myUsernameElem.textContent = currentUser.username || 'DemoUser';
+}
+
+const myAvatarElem = document.getElementById('myAvatar');
+if (myAvatarElem) {
+  myAvatarElem.src = currentUser.profilePic
+    ? resolveImage(currentUser.profilePic)
+    : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(currentUser.username || 'DemoUser');
+}
 
 // โกลบอลสเตตสำหรับ Leaflet Map, โพสต์ทั้งหมด และ พิกัด GPS ผู้ใช้
 let map = null;
@@ -16,6 +23,8 @@ let userCurrentCoords = null; // { lat, lng }
 // เริ่มต้น Leaflet.js Map
 function initMap() {
   if (typeof L === 'undefined') return;
+  const mapElement = document.getElementById('mainMap');
+  if (!mapElement) return;
   
   // ตำแหน่งเริ่มต้น: ประเทศไทย
   map = L.map('mainMap').setView([13.7367, 100.5231], 6);
@@ -69,16 +78,18 @@ const locationNameInput = document.getElementById('locationNameInput');
 const latInput = document.getElementById('latInput');
 const lngInput = document.getElementById('lngInput');
 
-presetSelect.addEventListener('change', () => {
-  const val = presetSelect.value;
-  if (!val) return;
-  const parts = val.split('|');
-  if (parts.length === 3) {
-    locationNameInput.value = parts[0];
-    latInput.value = parts[1];
-    lngInput.value = parts[2];
-  }
-});
+if (presetSelect) {
+  presetSelect.addEventListener('change', () => {
+    const val = presetSelect.value;
+    if (!val) return;
+    const parts = val.split('|');
+    if (parts.length === 3) {
+      if (locationNameInput) locationNameInput.value = parts[0];
+      if (latInput) latInput.value = parts[1];
+      if (lngInput) lngInput.value = parts[2];
+    }
+  });
+}
 
 // ดึงพิกัด GPS ผู้ใช้จาก Browser Geolocation API
 function getUserLocation(onSuccess) {
@@ -88,7 +99,7 @@ function getUserLocation(onSuccess) {
   }
 
   const statusSpan = document.getElementById('userLocationStatus');
-  statusSpan.textContent = '⏳ กำลังค้นหาตำแหน่ง GPS...';
+  if (statusSpan) statusSpan.textContent = '⏳ กำลังค้นหาตำแหน่ง GPS...';
 
   navigator.geolocation.getCurrentPosition(
     (position) => {
@@ -96,28 +107,36 @@ function getUserLocation(onSuccess) {
         lat: position.coords.latitude,
         lng: position.coords.longitude
       };
-      statusSpan.textContent = `📍 ${userCurrentCoords.lat.toFixed(4)}, ${userCurrentCoords.lng.toFixed(4)}`;
+      if (statusSpan) {
+        statusSpan.textContent = `📍 ${userCurrentCoords.lat.toFixed(4)}, ${userCurrentCoords.lng.toFixed(4)}`;
+      }
       if (onSuccess) onSuccess(userCurrentCoords);
       renderFeedWithSorting();
     },
     (err) => {
-      statusSpan.textContent = '❌ ไม่สามารถดึงตำแหน่งได้';
+      if (statusSpan) statusSpan.textContent = '❌ ไม่สามารถดึงตำแหน่งได้';
       alert('ไม่สามารถดึงตำแหน่ง GPS ได้: ' + err.message);
     }
   );
 }
 
-document.getElementById('getGpsBtn').addEventListener('click', () => {
-  getUserLocation((coords) => {
-    latInput.value = coords.lat.toFixed(6);
-    lngInput.value = coords.lng.toFixed(6);
-    locationNameInput.value = 'ตำแหน่งปัจจุบันของฉัน';
+const getGpsBtn = document.getElementById('getGpsBtn');
+if (getGpsBtn) {
+  getGpsBtn.addEventListener('click', () => {
+    getUserLocation((coords) => {
+      if (latInput) latInput.value = coords.lat.toFixed(6);
+      if (lngInput) lngInput.value = coords.lng.toFixed(6);
+      if (locationNameInput) locationNameInput.value = 'ตำแหน่งปัจจุบันของฉัน';
+    });
   });
-});
+}
 
-document.getElementById('calcDistanceBtn').addEventListener('click', () => {
-  getUserLocation();
-});
+const calcDistanceBtn = document.getElementById('calcDistanceBtn');
+if (calcDistanceBtn) {
+  calcDistanceBtn.addEventListener('click', () => {
+    getUserLocation();
+  });
+}
 
 // คำนวณระยะทางจากสูตร Haversine (กิโลเมตร)
 function calculateDistanceKm(lat1, lon1, lat2, lon2) {
@@ -141,79 +160,92 @@ const imagePreviewContainer = document.getElementById('imagePreviewContainer');
 const imagePreview = document.getElementById('imagePreview');
 const removeImageBtn = document.getElementById('removeImageBtn');
 
-postImageInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    selectedImageFile = file;
-    const reader = new FileReader();
-    reader.onload = function (evt) {
-      imagePreview.src = evt.target.result;
-      imagePreviewContainer.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-  }
-});
+if (postImageInput) {
+  postImageInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      selectedImageFile = file;
+      const reader = new FileReader();
+      reader.onload = function (evt) {
+        if (imagePreview) imagePreview.src = evt.target.result;
+        if (imagePreviewContainer) imagePreviewContainer.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
 
-removeImageBtn.addEventListener('click', () => {
-  selectedImageFile = null;
-  postImageInput.value = '';
-  imagePreview.src = '';
-  imagePreviewContainer.style.display = 'none';
-});
+if (removeImageBtn) {
+  removeImageBtn.addEventListener('click', () => {
+    selectedImageFile = null;
+    if (postImageInput) postImageInput.value = '';
+    if (imagePreview) imagePreview.src = '';
+    if (imagePreviewContainer) imagePreviewContainer.style.display = 'none';
+  });
+}
 
 // ส่งโพสต์ใหม่
-document.getElementById('submitPostBtn').addEventListener('click', async () => {
-  const content = document.getElementById('postContent').value.trim();
-  const locationName = locationNameInput.value.trim();
-  const lat = latInput.value.trim();
-  const lng = lngInput.value.trim();
+const submitPostBtn = document.getElementById('submitPostBtn');
+if (submitPostBtn) {
+  submitPostBtn.addEventListener('click', async () => {
+    const postContentElem = document.getElementById('postContent');
+    const content = postContentElem ? postContentElem.value.trim() : '';
+    const locationName = locationNameInput ? locationNameInput.value.trim() : '';
+    const lat = latInput ? latInput.value.trim() : '';
+    const lng = lngInput ? lngInput.value.trim() : '';
 
-  const errorBox = document.getElementById('postError');
-  const submitBtn = document.getElementById('submitPostBtn');
-  errorBox.textContent = '';
-  errorBox.style.display = 'none';
+    const errorBox = document.getElementById('postError');
+    if (errorBox) {
+      errorBox.textContent = '';
+      errorBox.style.display = 'none';
+    }
 
-  if (!content && !selectedImageFile && !locationName) {
-    errorBox.textContent = 'กรุณากรอกข้อความ แนบรูปภาพ หรือระบุสถานที่ท่องเที่ยว';
-    errorBox.style.display = 'block';
-    return;
-  }
+    if (!content && !selectedImageFile && !locationName) {
+      if (errorBox) {
+        errorBox.textContent = 'กรุณากรอกข้อความ แนบรูปภาพ หรือระบุสถานที่ท่องเที่ยว';
+        errorBox.style.display = 'block';
+      }
+      return;
+    }
 
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'กำลังโพสต์...';
+    submitPostBtn.disabled = true;
+    submitPostBtn.textContent = 'กำลังโพสต์...';
 
-  try {
-    const formData = new FormData();
-    formData.append('content', content);
-    if (locationName) formData.append('locationName', locationName);
-    if (lat) formData.append('lat', lat);
-    if (lng) formData.append('lng', lng);
-    if (selectedImageFile) formData.append('image', selectedImageFile);
+    try {
+      const formData = new FormData();
+      formData.append('content', content);
+      if (locationName) formData.append('locationName', locationName);
+      if (lat) formData.append('lat', lat);
+      if (lng) formData.append('lng', lng);
+      if (selectedImageFile) formData.append('image', selectedImageFile);
 
-    const newPost = await apiUpload('/posts', 'POST', formData);
+      const newPost = await apiUpload('/posts', 'POST', formData);
 
-    // ล้างฟอร์ม
-    document.getElementById('postContent').value = '';
-    locationNameInput.value = '';
-    latInput.value = '';
-    lngInput.value = '';
-    presetSelect.value = '';
-    postImageInput.value = '';
-    selectedImageFile = null;
-    imagePreview.src = '';
-    imagePreviewContainer.style.display = 'none';
+      // ล้างฟอร์ม
+      if (postContentElem) postContentElem.value = '';
+      if (locationNameInput) locationNameInput.value = '';
+      if (latInput) latInput.value = '';
+      if (lngInput) lngInput.value = '';
+      if (presetSelect) presetSelect.value = '';
+      if (postImageInput) postImageInput.value = '';
+      selectedImageFile = null;
+      if (imagePreview) imagePreview.src = '';
+      if (imagePreviewContainer) imagePreviewContainer.style.display = 'none';
 
-    allPostsList.unshift(newPost);
-    renderFeedWithSorting();
-    updateMapMarkers(allPostsList);
-  } catch (err) {
-    errorBox.textContent = err.message;
-    errorBox.style.display = 'block';
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = '✨ โพสต์เลย';
-  }
-});
+      allPostsList.unshift(newPost);
+      renderFeedWithSorting();
+      updateMapMarkers(allPostsList);
+    } catch (err) {
+      if (errorBox) {
+        errorBox.textContent = err.message;
+        errorBox.style.display = 'block';
+      }
+    } finally {
+      submitPostBtn.disabled = false;
+      submitPostBtn.textContent = '✨ โพสต์เลย';
+    }
+  });
+}
 
 // โหลดฟีดข้อมูล
 async function loadFeed() {
@@ -225,27 +257,31 @@ async function loadFeed() {
     allPostsList = posts || [];
 
     if (!allPostsList || allPostsList.length === 0) {
-      feedEmpty.style.display = 'block';
+      if (feedEmpty) feedEmpty.style.display = 'block';
       return;
     }
-    feedEmpty.style.display = 'none';
+    if (feedEmpty) feedEmpty.style.display = 'none';
 
     renderFeedWithSorting();
     updateMapMarkers(allPostsList);
   } catch (err) {
-    feedContainer.innerHTML = `<p class="error-msg">${err.message}</p>`;
+    if (feedContainer) feedContainer.innerHTML = `<p class="error-msg">${err.message}</p>`;
   }
 }
 
 // กรองและเรียงโพสต์
-document.getElementById('sortOrderSelect').addEventListener('change', () => {
-  renderFeedWithSorting();
-});
+const sortOrderSelect = document.getElementById('sortOrderSelect');
+if (sortOrderSelect) {
+  sortOrderSelect.addEventListener('change', () => {
+    renderFeedWithSorting();
+  });
+}
 
 function renderFeedWithSorting() {
   const feedContainer = document.getElementById('feedContainer');
   const feedEmpty = document.getElementById('feedEmpty');
-  const sortMode = document.getElementById('sortOrderSelect').value;
+  const sortSelect = document.getElementById('sortOrderSelect');
+  const sortMode = sortSelect ? sortSelect.value : 'latest';
 
   let displayPosts = [...allPostsList];
 
@@ -263,15 +299,15 @@ function renderFeedWithSorting() {
     });
   }
 
-  feedContainer.innerHTML = '';
+  if (feedContainer) feedContainer.innerHTML = '';
   if (displayPosts.length === 0) {
-    feedEmpty.style.display = 'block';
+    if (feedEmpty) feedEmpty.style.display = 'block';
     return;
   }
-  feedEmpty.style.display = 'none';
+  if (feedEmpty) feedEmpty.style.display = 'none';
 
   displayPosts.forEach((post) => {
-    feedContainer.appendChild(renderPostCard(post));
+    if (feedContainer) feedContainer.appendChild(renderPostCard(post));
   });
 }
 
@@ -283,7 +319,7 @@ function renderPostCard(post) {
   const liked = likesArray.includes(currentUserId);
   const avatarUrl = post.user && post.user.profilePic
     ? resolveImage(post.user.profilePic)
-    : 'https://ui-avatars.com/api/?name=' + (post.user ? post.user.username : 'User');
+    : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(post.user ? post.user.username : 'User');
 
   const username = post.user ? post.user.username : 'User';
   const userId = post.user ? (post.user._id || post.user.id) : '';
@@ -319,7 +355,7 @@ function renderPostCard(post) {
         </a>
         <div>
           <a href="profile.html?id=${userId}" class="post-user-name">
-            ${username}
+            ${escapeHtml(username)}
           </a>
           <div class="post-meta-sub">
             <span>${timeAgo(post.createdAt || new Date())}</span> · <span>🌐</span>
@@ -362,7 +398,7 @@ function renderPostCard(post) {
     <div class="comments-section" style="display:none">
       <div class="comments-list"></div>
       <div class="comment-input-row">
-        <img class="avatar-sm" src="${currentUser.profilePic ? resolveImage(currentUser.profilePic) : 'https://ui-avatars.com/api/?name=' + currentUser.username}">
+        <img class="avatar-sm" src="${currentUser.profilePic ? resolveImage(currentUser.profilePic) : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(currentUser.username)}">
         <input type="text" class="comment-input-box" placeholder="เขียนความคิดเห็นสาธารณะ...">
       </div>
     </div>
@@ -426,13 +462,13 @@ function renderComments(container, comments) {
     .map((c) => {
       const avatarUrl = c.user && c.user.profilePic
         ? resolveImage(c.user.profilePic)
-        : 'https://ui-avatars.com/api/?name=' + (c.user ? c.user.username : 'User');
+        : 'https://ui-avatars.com/api/?name=' + encodeURIComponent(c.user ? c.user.username : 'User');
       const username = c.user ? c.user.username : 'User';
       return `
         <div class="comment-item">
           <img class="avatar-sm" src="${avatarUrl}">
           <div class="comment-bubble">
-            <a href="profile.html?id=${c.user ? (c.user._id || c.user.id) : ''}" class="comment-bubble-author">${username}</a>
+            <a href="profile.html?id=${c.user ? (c.user._id || c.user.id) : ''}" class="comment-bubble-author">${escapeHtml(username)}</a>
             <div class="comment-bubble-text">${escapeHtml(c.text)}</div>
           </div>
         </div>
