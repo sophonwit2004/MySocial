@@ -220,14 +220,10 @@ if (submitPostBtn) {
     submitPostBtn.textContent = 'กำลังโพสต์...';
 
     try {
-      // แปลงรูปภาพเป็น Base64 Data URL เพื่อให้เก็บได้ถาวรข้ามการล็อกอินและรีเฟรช
+      // แปลงรูปภาพและบีบอัดภาพเพื่อเก็บถาวรใน LocalStorage โดยไม่เกินความจุเบราว์เซอร์
       let imageBase64 = '';
       if (selectedImageFile) {
-        imageBase64 = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target.result);
-          reader.readAsDataURL(selectedImageFile);
-        });
+        imageBase64 = await compressImage(selectedImageFile);
       }
 
       const formData = new FormData();
@@ -240,6 +236,8 @@ if (submitPostBtn) {
       const newPost = await apiUpload('/posts', 'POST', formData);
 
       if (imageBase64 && (!newPost.imageUrl || newPost.imageUrl.startsWith('blob:'))) {
+        newPost.imageUrl = imageBase64;
+      } else if (!newPost.imageUrl && imageBase64) {
         newPost.imageUrl = imageBase64;
       }
 

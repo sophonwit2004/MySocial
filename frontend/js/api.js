@@ -34,6 +34,46 @@ function requireLogin() {
   }
 }
 
+// ==== ฟังก์ชันบีบอัดรูปภาพก่อนเก็บลงดิสก์/LocalStorage เพื่อไม่ให้เกิน Quota ====
+function compressImage(file, maxWidth = 800, maxHeight = 800, quality = 0.7) {
+  return new Promise((resolve) => {
+    if (!file || !(file instanceof File || file instanceof Blob)) {
+      return resolve('');
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth || height > maxHeight) {
+          if (width / height > maxWidth / maxHeight) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(dataUrl);
+      };
+      img.onerror = () => resolve(e.target.result);
+      img.src = e.target.result;
+    };
+    reader.onerror = () => resolve('');
+    reader.readAsDataURL(file);
+  });
+}
+
 // ==== ระบบบันทึกโพสต์ถาวรใน LocalStorage เพื่อไม่ให้โพสต์หายเมื่อรีเฟรช/ออกจากระบบแล้วเข้าใหม่ ====
 function getSavedLocalPosts() {
   try {
@@ -46,11 +86,19 @@ function getSavedLocalPosts() {
 
 function saveLocalPost(post) {
   try {
+    if (!post || !post._id) return;
     const posts = getSavedLocalPosts();
     // กรองถ้ามี ID ซ้ำ และเพิ่มไว้บนสุด
     const filtered = posts.filter(p => p._id !== post._id);
     filtered.unshift(post);
-    localStorage.setItem('madoo_saved_posts', JSON.stringify(filtered));
+
+    try {
+      localStorage.setItem('madoo_saved_posts', JSON.stringify(filtered));
+    } catch (quotaErr) {
+      // หากเกินความจุเบราว์เซอร์ ให้ย่อเก็บเฉพาะ 20 โพสต์ล่าสุด
+      const trimmed = filtered.slice(0, 20);
+      localStorage.setItem('madoo_saved_posts', JSON.stringify(trimmed));
+    }
   } catch (err) {
     console.error('Cannot save post to localStorage:', err);
   }
@@ -90,7 +138,6 @@ async function apiRequest(path, method = 'GET', body = null) {
     if (!res.ok) throw new Error(data.message || 'เกิดข้อผิดพลาด');
     return data;
   } catch (err) {
-    // โหมดสลับ Demo/Offline อัตโนมัติเมื่อไม่ได้เชื่อมต่อเซิร์ฟเวอร์
     if (path.includes('/auth/login') || path.includes('/auth/register')) {
       return {
         token: 'demo_token_123',
@@ -166,7 +213,7 @@ async function apiUpload(path, method, formData) {
     const lng = formData.get('lng') || null;
 
     return {
-      _id: 'post_' + Date.now(),
+      _id: 'post_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
       content,
       locationName,
       lat: lat ? parseFloat(lat) : null,
