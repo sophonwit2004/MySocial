@@ -3,58 +3,151 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MySocial 🌌 - หน้าฟีด</title>
+<title>facebook</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
+<!-- Facebook Top Navbar -->
 <div class="navbar">
-  <h1>🌌 MySocial</h1>
-  <div class="nav-links">
-    <a href="search.html">🔍 ค้นหา</a>
-    <a href="profile.html" id="myProfileLink">👤 โปรไฟล์</a>
-    <button onclick="logout()">🚪 ออกจากระบบ</button>
+  <div class="fb-brand">
+    <a href="index.html" class="fb-logo">facebook</a>
+    <div class="fb-search-bar">
+      <span style="color:var(--fb-text-secondary);">🔍</span>
+      <input type="text" id="topSearchInput" placeholder="ค้นหาบน Facebook" onclick="window.location.href='search.html'">
+    </div>
+  </div>
+
+  <div class="fb-nav-tabs">
+    <a href="index.html" class="fb-tab active" title="หน้าหลัก">🏠</a>
+    <a href="search.html" class="fb-tab" title="ค้นหาเพื่อน">👥</a>
+    <a href="profile.html" class="fb-tab" title="โปรไฟล์">👤</a>
+  </div>
+
+  <div class="fb-nav-right">
+    <button class="icon-circle-btn" onclick="window.location.href='search.html'" title="ค้นหา">🔍</button>
+    <button class="icon-circle-btn" title="ข้อความ">💬</button>
+    <button class="icon-circle-btn" title="การแจ้งเตือน">🔔</button>
+    <button class="icon-circle-btn" onclick="logout()" title="ออกจากระบบ">🚪</button>
   </div>
 </div>
 
-<div class="container">
+<!-- Facebook 3-Column Layout -->
+<div class="fb-main-layout">
 
-  <div class="card post-form">
-    <div class="post-header">
-      <img id="myAvatar" class="avatar" src="">
-      <div>
-        <strong id="myUsername" style="font-size:17px; font-weight:700; color:var(--text-main);"></strong>
-        <div style="font-size:12px; color:var(--accent-cyan); font-weight:600; display:flex; align-items:center; gap:4px;">
-          <span>🌐 สาธารณะ</span> · <span style="color:var(--accent-pink);">⚡ Live</span>
-        </div>
-      </div>
-    </div>
-    <textarea id="postContent" placeholder="คุณกำลังคิดอะไรอยู่? แบ่งปันให้จักรวาลรู้สิ..."></textarea>
-
-    <!-- พรีวิวรูปภาพที่เลือก -->
-    <div id="imagePreviewContainer" style="display:none; position:relative; margin-top:10px;">
-      <img id="imagePreview" style="max-width:100%; max-height:320px; border-radius:12px; display:block; border: 1px solid var(--glass-border); box-shadow:0 0 20px rgba(0,240,255,0.2);">
-      <button type="button" id="removeImageBtn" style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.8); color:#ff3366; border:1px solid rgba(255,51,102,0.4); border-radius:50%; width:32px; height:32px; cursor:pointer; font-weight:bold; font-size:16px;">✕</button>
-    </div>
-
-    <div class="form-actions" style="margin-top:14px; display:flex; justify-content:space-between; align-items:center;">
-      <label class="file-label" style="display:inline-flex; align-items:center; gap:8px; background:rgba(0, 240, 255, 0.1); border:1px solid rgba(0, 240, 255, 0.3); padding:8px 16px; border-radius:20px; font-weight:600; color:var(--accent-cyan);">
-        🖼️ เพิ่มรูปภาพ
-        <input type="file" id="postImage" accept="image/*" style="display:none">
-      </label>
-      <button class="btn" style="width:auto; padding:10px 28px; border-radius:20px; font-weight:bold;" id="submitPostBtn">✨ โพสต์</button>
-    </div>
-    <div id="postError" class="error-msg" style="display:none; margin-top:10px;"></div>
+  <!-- Left Sidebar -->
+  <div class="fb-sidebar">
+    <a href="profile.html" class="sidebar-menu-item">
+      <img id="sidebarAvatar" class="sidebar-avatar" src="">
+      <span id="sidebarUsername"></span>
+    </a>
+    <a href="search.html" class="sidebar-menu-item">
+      <div class="sidebar-icon-box">👥</div>
+      <span>ค้นหาเพื่อน</span>
+    </a>
+    <a href="index.html" class="sidebar-menu-item">
+      <div class="sidebar-icon-box" style="color:#e41e3f; background:rgba(228,30,63,0.15)">⏰</div>
+      <span>ความทรงจำ</span>
+    </a>
+    <a href="index.html" class="sidebar-menu-item">
+      <div class="sidebar-icon-box" style="color:#f7b928; background:rgba(247,185,40,0.15)">🔖</div>
+      <span>บันทึกไว้</span>
+    </a>
+    <a href="index.html" class="sidebar-menu-item">
+      <div class="sidebar-icon-box" style="color:#1877f2; background:rgba(24,119,242,0.15)">👨‍👩‍👧‍👦</div>
+      <span>กลุ่ม</span>
+    </a>
   </div>
 
-  <div id="feedContainer"></div>
-  <div id="feedEmpty" class="text-muted" style="text-align:center; display:none; padding:50px 0; font-size:15px;">
-    ยังไม่มีโพสต์ในฟีด พิมพ์อะไรสักอย่างในกล่องด้านบนแล้วกด "โพสต์" ได้เลยครับ! 🚀
+  <!-- Middle Feed Section -->
+  <div class="fb-feed-content">
+
+    <!-- Composer Box (คุณกำลังคิดอะไรอยู่?) -->
+    <div class="card">
+      <div class="composer-top">
+        <img id="myAvatar" class="avatar" src="">
+        <button type="button" class="composer-input-trigger" id="openComposerBtn">
+          คุณกำลังคิดอะไรอยู่, <span id="myUsername"></span>?
+        </button>
+      </div>
+
+      <!-- Expandable Textarea -->
+      <div id="expandedComposer" style="display:none; margin-top:10px;">
+        <textarea id="postContent" class="composer-textarea" placeholder="คุณกำลังคิดอะไรอยู่?"></textarea>
+
+        <!-- Preview Image Container -->
+        <div id="imagePreviewContainer" style="display:none; position:relative; margin-top:10px;">
+          <img id="imagePreview" style="max-width:100%; max-height:300px; border-radius:8px; display:block;">
+          <button type="button" id="removeImageBtn" style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.7); color:#fff; border:none; border-radius:50%; width:28px; height:28px; cursor:pointer; font-weight:bold;">✕</button>
+        </div>
+
+        <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
+          <label class="file-label" style="display:inline-flex; align-items:center; gap:6px; cursor:pointer; color:var(--fb-green); font-weight:600;">
+            🖼️ รูปภาพ/วิดีโอ
+            <input type="file" id="postImage" accept="image/*" style="display:none">
+          </label>
+          <button class="btn" style="width:auto; padding:8px 24px;" id="submitPostBtn">โพสต์</button>
+        </div>
+      </div>
+
+      <div class="composer-bottom">
+        <button class="composer-action-btn" onclick="document.getElementById('openComposerBtn').click()">
+          <span style="color:var(--fb-red); font-size:18px;">🎥</span> วิดีโอถ่ายทอดสด
+        </button>
+        <label class="composer-action-btn" style="cursor:pointer;" onclick="document.getElementById('openComposerBtn').click()">
+          <span style="color:var(--fb-green); font-size:18px;">🖼️</span> รูปภาพ/วิดีโอ
+        </label>
+        <button class="composer-action-btn" onclick="document.getElementById('openComposerBtn').click()">
+          <span style="color:var(--fb-yellow); font-size:18px;">😊</span> ความรู้สึก/กิจกรรม
+        </button>
+      </div>
+      <div id="postError" class="error-msg" style="display:none; margin-top:10px;"></div>
+    </div>
+
+    <!-- Posts Feed Container -->
+    <div id="feedContainer"></div>
+    <div id="feedEmpty" class="text-muted" style="text-align:center; display:none; padding:40px 0;">
+      ยังไม่มีโพสต์ในฟีด พิมพ์ข้อความแล้วกด "โพสต์" ได้เลยครับ!
+    </div>
+
+  </div>
+
+  <!-- Right Sidebar (Contacts) -->
+  <div class="fb-sidebar">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; color:var(--fb-text-secondary); font-weight:600; font-size:15px;">
+      <span>ผู้ติดต่อ</span>
+      <div>🔍 💬 ⋯</div>
+    </div>
+
+    <div class="sidebar-menu-item">
+      <div style="position:relative;">
+        <img class="sidebar-avatar" src="https://ui-avatars.com/api/?name=Admin+Facebook">
+        <span style="position:absolute; bottom:0; right:0; width:10px; height:10px; background:var(--fb-green); border-radius:50%; border:2px solid var(--fb-card);"></span>
+      </div>
+      <span>Admin Facebook</span>
+    </div>
+
+    <div class="sidebar-menu-item">
+      <div style="position:relative;">
+        <img class="sidebar-avatar" src="https://ui-avatars.com/api/?name=Demo+User">
+        <span style="position:absolute; bottom:0; right:0; width:10px; height:10px; background:var(--fb-green); border-radius:50%; border:2px solid var(--fb-card);"></span>
+      </div>
+      <span>Demo User</span>
+    </div>
   </div>
 
 </div>
 
 <script src="js/api.js"></script>
 <script src="js/feed.js"></script>
+<script>
+document.getElementById('openComposerBtn').addEventListener('click', () => {
+  const expanded = document.getElementById('expandedComposer');
+  expanded.style.display = expanded.style.display === 'none' ? 'block' : 'none';
+  if (expanded.style.display === 'block') {
+    document.getElementById('postContent').focus();
+  }
+});
+</script>
 </body>
 </html>

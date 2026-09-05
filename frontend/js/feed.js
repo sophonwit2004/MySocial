@@ -7,6 +7,15 @@ document.getElementById('myAvatar').src = currentUser.profilePic
   ? resolveImage(currentUser.profilePic)
   : 'https://ui-avatars.com/api/?name=' + currentUser.username;
 
+if (document.getElementById('sidebarUsername')) {
+  document.getElementById('sidebarUsername').textContent = currentUser.username;
+}
+if (document.getElementById('sidebarAvatar')) {
+  document.getElementById('sidebarAvatar').src = currentUser.profilePic
+    ? resolveImage(currentUser.profilePic)
+    : 'https://ui-avatars.com/api/?name=' + currentUser.username;
+}
+
 let selectedImageFile = null;
 
 const postImageInput = document.getElementById('postImage');
@@ -39,9 +48,11 @@ document.getElementById('submitPostBtn').addEventListener('click', async () => {
   const errorBox = document.getElementById('postError');
   const submitBtn = document.getElementById('submitPostBtn');
   errorBox.textContent = '';
+  errorBox.style.display = 'none';
 
   if (!content && !selectedImageFile) {
     errorBox.textContent = 'กรุณาพิมพ์ข้อความหรือแนบรูปภาพ';
+    errorBox.style.display = 'block';
     return;
   }
 
@@ -61,6 +72,9 @@ document.getElementById('submitPostBtn').addEventListener('click', async () => {
     selectedImageFile = null;
     imagePreview.src = '';
     imagePreviewContainer.style.display = 'none';
+    if (document.getElementById('expandedComposer')) {
+      document.getElementById('expandedComposer').style.display = 'none';
+    }
 
     // เพิ่มโพสต์ใหม่ไว้บนสุดของฟีดทันที
     const feedContainer = document.getElementById('feedContainer');
@@ -71,6 +85,7 @@ document.getElementById('submitPostBtn').addEventListener('click', async () => {
     feedContainer.prepend(card);
   } catch (err) {
     errorBox.textContent = err.message;
+    errorBox.style.display = 'block';
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = 'โพสต์';
@@ -112,35 +127,51 @@ function renderPostCard(post) {
   const username = post.user ? post.user.username : 'User';
   const userId = post.user ? (post.user._id || post.user.id) : '';
 
-  // เช็คสิทธิ์ลบโพสต์: โพสต์ของตัวเอง หรือ โหมด Demo
   const canDelete = !userId || userId === currentUserId || currentUserId.startsWith('demo') || userId.startsWith('demo');
 
   card.innerHTML = `
-    <div class="post-header" style="display:flex; justify-content:space-between; align-items:center;">
-      <div style="display:flex; align-items:center; gap:10px;">
+    <div class="post-header">
+      <div class="post-header-left">
         <a href="profile.html?id=${userId}">
           <img class="avatar" src="${avatarUrl}">
         </a>
         <div>
-          <a href="profile.html?id=${userId}" class="post-user" style="text-decoration:none; color:inherit; font-weight:bold;">
+          <a href="profile.html?id=${userId}" class="post-user-name">
             ${username}
           </a>
-          <div class="post-time">${timeAgo(post.createdAt || new Date())}</div>
+          <div class="post-meta-sub">
+            <span>${timeAgo(post.createdAt || new Date())}</span> · <span>🌐</span>
+          </div>
         </div>
       </div>
-      ${canDelete ? `<button class="delete-btn" style="background:#ffebe9; color:#e41e3f; border:none; padding:6px 14px; border-radius:16px; font-weight:bold; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:4px;">🗑️ ลบโพสต์</button>` : ''}
+      ${canDelete ? `<button class="delete-btn icon-circle-btn" style="width:32px; height:32px; font-size:14px;" title="ลบโพสต์">🗑️</button>` : ''}
     </div>
-    ${post.content ? `<div class="post-content" style="margin:12px 0;">${escapeHtml(post.content)}</div>` : ''}
-    ${post.imageUrl ? `<img class="post-image" src="${resolveImage(post.imageUrl)}" style="max-width:100%; border-radius:8px; margin-bottom:10px;">` : ''}
-    <div class="post-actions">
-      <button class="like-btn ${liked ? 'liked' : ''}">👍 ถูกใจ (<span class="like-count">${likesArray.length}</span>)</button>
-      <button class="comment-toggle-btn">💬 คอมเมนต์ (${(post.comments || []).length})</button>
+
+    ${post.content ? `<div style="font-size:15px; margin-bottom:10px; white-space:pre-wrap;">${escapeHtml(post.content)}</div>` : ''}
+    ${post.imageUrl ? `<img src="${resolveImage(post.imageUrl)}" style="width:100%; border-radius:8px; margin-bottom:10px;">` : ''}
+
+    <div class="post-stats-row">
+      <div>👍 ❤️ <span class="like-count">${likesArray.length}</span></div>
+      <div><span class="comment-count">${(post.comments || []).length}</span> ความคิดเห็น</div>
     </div>
+
+    <div class="post-actions-bar">
+      <button class="fb-action-btn like-btn ${liked ? 'liked' : ''}">
+        👍 <span>ถูกใจ</span>
+      </button>
+      <button class="fb-action-btn comment-toggle-btn">
+        💬 <span>แสดงความคิดเห็น</span>
+      </button>
+      <button class="fb-action-btn" onclick="alert('คัดลอกลิงก์โพสต์เรียบร้อยแล้ว!')">
+        ↗️ <span>แชร์</span>
+      </button>
+    </div>
+
     <div class="comments-section" style="display:none">
       <div class="comments-list"></div>
-      <div class="comment-form">
-        <input type="text" placeholder="เขียนคอมเมนต์...">
-        <button class="btn" style="width:auto; padding:8px 16px; border-radius:16px">ส่ง</button>
+      <div class="comment-input-row">
+        <img class="avatar-sm" src="${currentUser.profilePic ? resolveImage(currentUser.profilePic) : 'https://ui-avatars.com/api/?name=' + currentUser.username}">
+        <input type="text" class="comment-input-box" placeholder="เขียนความคิดเห็นสาธารณะ...">
       </div>
     </div>
   `;
@@ -164,11 +195,6 @@ function renderPostCard(post) {
         await apiRequest(`/posts/${post._id}`, 'DELETE');
       } catch (err) {}
       card.remove();
-      const feedContainer = document.getElementById('feedContainer');
-      const feedEmpty = document.getElementById('feedEmpty');
-      if (feedContainer.children.length === 0) {
-        feedEmpty.style.display = 'block';
-      }
     });
   }
 
@@ -181,19 +207,21 @@ function renderPostCard(post) {
     if (isHidden) renderComments(commentsList, post.comments || []);
   });
 
-  // ส่งคอมเมนต์
-  const commentInput = card.querySelector('.comment-form input');
-  card.querySelector('.comment-form button').addEventListener('click', async () => {
-    const text = commentInput.value.trim();
-    if (!text) return;
-    try {
-      const newComment = await apiRequest(`/posts/${post._id}/comment`, 'POST', { text });
-      post.comments = post.comments || [];
-      post.comments.push(newComment);
-      renderComments(commentsList, post.comments);
-      commentInput.value = '';
-      card.querySelector('.comment-toggle-btn').textContent = `💬 คอมเมนต์ (${post.comments.length})`;
-    } catch (err) {}
+  // ส่งคอมเมนต์ด้วย Enter Key
+  const commentInput = card.querySelector('.comment-input-box');
+  commentInput.addEventListener('keypress', async (e) => {
+    if (e.key === 'Enter') {
+      const text = commentInput.value.trim();
+      if (!text) return;
+      try {
+        const newComment = await apiRequest(`/posts/${post._id}/comment`, 'POST', { text });
+        post.comments = post.comments || [];
+        post.comments.push(newComment);
+        renderComments(commentsList, post.comments);
+        commentInput.value = '';
+        card.querySelector('.comment-count').textContent = post.comments.length;
+      } catch (err) {}
+    }
   });
 
   return card;
@@ -207,10 +235,11 @@ function renderComments(container, comments) {
         : 'https://ui-avatars.com/api/?name=' + (c.user ? c.user.username : 'User');
       const username = c.user ? c.user.username : 'User';
       return `
-        <div class="comment">
+        <div class="comment-item">
           <img class="avatar-sm" src="${avatarUrl}">
           <div class="comment-bubble">
-            <strong>${username}</strong><br>${escapeHtml(c.text)}
+            <a href="#" class="comment-bubble-author">${username}</a>
+            <div class="comment-bubble-text">${escapeHtml(c.text)}</div>
           </div>
         </div>
       `;

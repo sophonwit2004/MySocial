@@ -3,30 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>เข้าสู่ระบบ - MySocial 🌌</title>
+<title>Facebook – เข้าสู่ระบบหรือสมัครใช้งาน</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<div class="auth-box">
-  <h2>🌌 MySocial</h2>
-  <p style="text-align:center; color:var(--text-muted); font-size:14px; margin-bottom:20px;">เข้าสู่ระบบจักรวาลโซเชียลของคุณ</p>
-  <div id="errorMsg" class="error-msg" style="display:none;"></div>
-  <form id="loginForm">
-    <input type="email" id="email" placeholder="📧 อีเมลของคุณ" required>
-    <input type="password" id="password" placeholder="🔒 รหัสผ่าน" required>
-    <button type="submit" class="btn">⚡ เข้าสู่ระบบ</button>
-  </form>
-
-  <div style="margin-top: 14px;">
-    <button type="button" id="demoLoginBtn" class="btn btn-secondary" style="background: linear-gradient(135deg, #00f5a0 0%, #00d9f6 100%); color: #06070d; font-weight: 800; border:none; box-shadow: 0 4px 20px rgba(0, 245, 160, 0.4);">
-      🚀 เข้าสู่ระบบด่วน (บัญชีทดลอง)
-    </button>
+<div class="fb-login-wrapper">
+  
+  <div class="fb-login-left">
+    <h1>facebook</h1>
+    <p>ช่วยคุณเชื่อมต่อและแบ่งปันกับผู้คนมากมายรอบตัวคุณ</p>
   </div>
 
-  <div class="auth-switch">
-    ยังไม่มีบัญชี? <a href="register.html">สมัครสมาชิกที่นี่</a>
+  <div class="auth-box">
+    <div id="errorMsg" class="error-msg" style="display:none;"></div>
+    <form id="loginForm">
+      <input type="email" id="email" placeholder="อีเมลหรือหมายเลขโทรศัพท์" required>
+      <input type="password" id="password" placeholder="รหัสผ่าน" required>
+      <button type="submit" class="btn">เข้าสู่ระบบ</button>
+    </form>
+
+    <div style="text-align:center; margin:14px 0;">
+      <a href="#" style="color:var(--fb-blue); font-size:14px; text-decoration:none;">ลืมรหัสผ่านใช่หรือไม่?</a>
+    </div>
+
+    <hr style="border:none; border-top:1px solid var(--fb-border); margin:16px 0;">
+
+    <div>
+      <button type="button" id="demoLoginBtn" class="btn btn-green">
+        🚀 เข้าสู่ระบบด่วน (บัญชีทดลอง)
+      </button>
+    </div>
+
+    <div class="auth-switch" style="margin-top:14px;">
+      ยังไม่มีบัญชี? <a href="register.html">สร้างบัญชีใหม่</a>
+    </div>
   </div>
+
 </div>
 
 <script src="js/api.js"></script>
@@ -51,9 +64,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
 document.getElementById('demoLoginBtn').addEventListener('click', async () => {
   const errorMsg = document.getElementById('errorMsg');
   errorMsg.style.display = 'block';
-  errorMsg.style.color = 'var(--accent-cyan)';
-  errorMsg.style.background = 'rgba(0, 240, 255, 0.1)';
-  errorMsg.style.borderColor = 'rgba(0, 240, 255, 0.3)';
+  errorMsg.style.color = 'var(--fb-blue)';
   errorMsg.textContent = '🚀 กำลังเข้าสู่ระบบทดลอง...';
 
   const demoEmail = 'demo@example.com';
@@ -73,7 +84,7 @@ document.getElementById('demoLoginBtn').addEventListener('click', async () => {
     saveAuth(data.token, data.user);
     window.location.href = 'index.html';
   } catch (err) {
-    errorMsg.style.color = '#ff3366';
+    errorMsg.style.color = 'var(--fb-red)';
     errorMsg.textContent = err.message;
   }
 });
