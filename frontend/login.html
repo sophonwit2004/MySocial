@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>เข้าสู่ระบบ - MySocial</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="auth-box">
+  <h2>เข้าสู่ระบบ</h2>
+  <div id="errorMsg" class="error-msg"></div>
+  <form id="loginForm">
+    <input type="email" id="email" placeholder="อีเมล" required>
+    <input type="password" id="password" placeholder="รหัสผ่าน" required>
+    <button type="submit" class="btn">เข้าสู่ระบบ</button>
+  </form>
+  <div class="auth-switch">
+    ยังไม่มีบัญชี? <a href="register.html">สมัครสมาชิก</a>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const errorMsg = document.getElementById('errorMsg');
+  errorMsg.textContent = '';
+
+  try {
+    const data = await apiRequest('/auth/login', 'POST', { email, password });
+    saveAuth(data.token, data.user);
+    window.location.href = 'index.html';
+  } catch (err) {
+    errorMsg.textContent = err.message;
+  }
+});
+</script>
+</body>
+</html>

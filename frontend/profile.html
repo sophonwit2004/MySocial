@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>โปรไฟล์ - MySocial</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="navbar">
+  <h1>MySocial</h1>
+  <div class="nav-links">
+    <a href="index.html">ฟีด</a>
+    <a href="search.html">ค้นหา</a>
+    <button onclick="logout()">ออกจากระบบ</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="card">
+    <div class="profile-header">
+      <img id="profileAvatar" class="avatar" src="">
+      <div>
+        <h2 id="profileUsername"></h2>
+        <p id="profileBio" class="text-muted"></p>
+        <div class="follow-list">
+          <span><strong id="followersCount">0</strong> ผู้ติดตาม</span>
+          <span><strong id="followingCount">0</strong> กำลังติดตาม</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="ownProfileActions" style="display:none; margin-top:14px;">
+      <textarea id="bioInput" placeholder="เขียนเกี่ยวกับตัวคุณ..."></textarea>
+      <label class="file-label">
+        📷 เปลี่ยนรูปโปรไฟล์
+        <input type="file" id="profilePicInput" accept="image/*" style="display:none">
+      </label>
+      <button id="saveProfileBtn" class="btn" style="margin-top:10px">บันทึกโปรไฟล์</button>
+    </div>
+
+    <button id="followBtn" class="follow-btn" style="display:none; margin-top:14px;"></button>
+  </div>
+
+  <div id="userPosts"></div>
+
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/profile.js"></script>
+</body>
+</html>

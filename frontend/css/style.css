@@ -1,0 +1,304 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
+body {
+  background: #f0f2f5;
+  color: #1c1e21;
+}
+
+.navbar {
+  background: #fff;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.navbar h1 {
+  color: #1877f2;
+  font-size: 22px;
+}
+
+.navbar .nav-links a,
+.navbar .nav-links button {
+  margin-left: 14px;
+  text-decoration: none;
+  color: #1c1e21;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 0 12px;
+}
+
+.auth-box {
+  max-width: 380px;
+  margin: 60px auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.auth-box h2 {
+  text-align: center;
+  color: #1877f2;
+  margin-bottom: 20px;
+}
+
+.auth-box input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid #ccd0d5;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  background: #1877f2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn:hover { background: #145dbf; }
+
+.btn-secondary {
+  background: #e4e6eb;
+  color: #1c1e21;
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 14px;
+}
+
+.error-msg {
+  color: #e41e3f;
+  font-size: 14px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+.post-form textarea {
+  width: 100%;
+  border: 1px solid #ccd0d5;
+  border-radius: 8px;
+  padding: 10px;
+  resize: none;
+  font-size: 15px;
+  min-height: 60px;
+}
+
+.post-form .form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #ccd0d5;
+  object-fit: cover;
+}
+
+.avatar-sm {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ccd0d5;
+  object-fit: cover;
+}
+
+.post-user {
+  font-weight: 600;
+}
+
+.post-time {
+  font-size: 12px;
+  color: #65676b;
+}
+
+.post-content {
+  margin-bottom: 10px;
+  white-space: pre-wrap;
+}
+
+.post-image {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.post-actions {
+  display: flex;
+  gap: 16px;
+  border-top: 1px solid #eee;
+  padding-top: 8px;
+}
+
+.post-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #65676b;
+}
+
+.post-actions button.liked {
+  color: #e41e3f;
+  font-weight: 600;
+}
+
+.comments-section {
+  margin-top: 10px;
+  border-top: 1px solid #eee;
+  padding-top: 10px;
+}
+
+.comment {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.comment-bubble {
+  background: #f0f2f5;
+  border-radius: 12px;
+  padding: 6px 12px;
+}
+
+.comment-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.comment-form input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ccd0d5;
+  border-radius: 16px;
+  font-size: 14px;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.profile-header .avatar {
+  width: 80px;
+  height: 80px;
+}
+
+.follow-list {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+  color: #65676b;
+  margin-top: 6px;
+}
+
+.search-box {
+  margin-bottom: 16px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 20px;
+  border: 1px solid #ccd0d5;
+  font-size: 15px;
+}
+
+.user-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.user-row-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.follow-btn {
+  padding: 6px 16px;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  background: #1877f2;
+  color: #fff;
+  font-size: 13px;
+}
+
+.follow-btn.following {
+  background: #e4e6eb;
+  color: #1c1e21;
+}
+
+.text-muted {
+  color: #65676b;
+  font-size: 14px;
+}
+
+.file-label {
+  cursor: pointer;
+  color: #1877f2;
+  font-size: 14px;
+}
+
+textarea#bioInput {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccd0d5;
+  margin: 10px 0;
+  min-height: 60px;
+}

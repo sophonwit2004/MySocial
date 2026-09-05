@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>ค้นหา - MySocial</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="navbar">
+  <h1>MySocial</h1>
+  <div class="nav-links">
+    <a href="index.html">ฟีด</a>
+    <a href="profile.html">โปรไฟล์</a>
+    <button onclick="logout()">ออกจากระบบ</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="ค้นหาผู้ใช้จาก username...">
+  </div>
+  <div id="resultsList" class="card"></div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/search.js"></script>
+</body>
+</html>

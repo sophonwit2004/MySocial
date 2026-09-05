@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>MySocial - หน้าฟีด</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="navbar">
+  <h1>MySocial</h1>
+  <div class="nav-links">
+    <a href="search.html">ค้นหา</a>
+    <a href="profile.html" id="myProfileLink">โปรไฟล์</a>
+    <button onclick="logout()">ออกจากระบบ</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="card post-form">
+    <div class="post-header">
+      <img id="myAvatar" class="avatar" src="">
+      <strong id="myUsername"></strong>
+    </div>
+    <textarea id="postContent" placeholder="คุณกำลังคิดอะไรอยู่?"></textarea>
+    <div class="form-actions">
+      <label class="file-label">
+        📷 แนบรูปภาพ
+        <input type="file" id="postImage" accept="image/*" style="display:none">
+      </label>
+      <button class="btn" style="width:auto;padding:8px 20px" id="submitPostBtn">โพสต์</button>
+    </div>
+    <div id="postError" class="error-msg"></div>
+  </div>
+
+  <div id="feedContainer"></div>
+  <div id="feedEmpty" class="text-muted" style="text-align:center; display:none;">
+    ยังไม่มีโพสต์ในฟีด ลองติดตามเพื่อนหรือโพสต์อะไรสักอย่างดูสิ
+  </div>
+
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/feed.js"></script>
+</body>
+</html>
