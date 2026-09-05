@@ -1,5 +1,7 @@
 requireLogin();
 const currentUser = getCurrentUser();
+const currentUserId = currentUser.id || currentUser._id || 'demo_user_123';
+
 document.getElementById('myUsername').textContent = currentUser.username;
 document.getElementById('myAvatar').src = currentUser.profilePic
   ? resolveImage(currentUser.profilePic)
@@ -102,29 +104,34 @@ function renderPostCard(post) {
   card.className = 'card';
 
   const likesArray = post.likes || [];
-  const liked = likesArray.includes(currentUser.id);
+  const liked = likesArray.includes(currentUserId);
   const avatarUrl = post.user && post.user.profilePic
     ? resolveImage(post.user.profilePic)
     : 'https://ui-avatars.com/api/?name=' + (post.user ? post.user.username : 'User');
 
   const username = post.user ? post.user.username : 'User';
-  const userId = post.user ? post.user._id : '';
+  const userId = post.user ? (post.user._id || post.user.id) : '';
+
+  // เช็คสิทธิ์ลบโพสต์: โพสต์ของตัวเอง หรือ โหมด Demo
+  const canDelete = !userId || userId === currentUserId || currentUserId.startsWith('demo') || userId.startsWith('demo');
 
   card.innerHTML = `
-    <div class="post-header">
-      <a href="profile.html?id=${userId}">
-        <img class="avatar" src="${avatarUrl}">
-      </a>
-      <div>
-        <a href="profile.html?id=${userId}" class="post-user" style="text-decoration:none;color:inherit;font-weight:bold">
-          ${username}
+    <div class="post-header" style="display:flex; justify-content:space-between; align-items:center;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <a href="profile.html?id=${userId}">
+          <img class="avatar" src="${avatarUrl}">
         </a>
-        <div class="post-time">${timeAgo(post.createdAt || new Date())}</div>
+        <div>
+          <a href="profile.html?id=${userId}" class="post-user" style="text-decoration:none; color:inherit; font-weight:bold;">
+            ${username}
+          </a>
+          <div class="post-time">${timeAgo(post.createdAt || new Date())}</div>
+        </div>
       </div>
-      ${userId === currentUser.id ? `<button class="delete-btn" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#e41e3f;font-weight:bold">✕ ลบ</button>` : ''}
+      ${canDelete ? `<button class="delete-btn" style="background:#ffebe9; color:#e41e3f; border:none; padding:6px 14px; border-radius:16px; font-weight:bold; cursor:pointer; font-size:13px; display:inline-flex; align-items:center; gap:4px;">🗑️ ลบโพสต์</button>` : ''}
     </div>
-    ${post.content ? `<div class="post-content">${escapeHtml(post.content)}</div>` : ''}
-    ${post.imageUrl ? `<img class="post-image" src="${resolveImage(post.imageUrl)}">` : ''}
+    ${post.content ? `<div class="post-content" style="margin:12px 0;">${escapeHtml(post.content)}</div>` : ''}
+    ${post.imageUrl ? `<img class="post-image" src="${resolveImage(post.imageUrl)}" style="max-width:100%; border-radius:8px; margin-bottom:10px;">` : ''}
     <div class="post-actions">
       <button class="like-btn ${liked ? 'liked' : ''}">👍 ถูกใจ (<span class="like-count">${likesArray.length}</span>)</button>
       <button class="comment-toggle-btn">💬 คอมเมนต์ (${(post.comments || []).length})</button>
@@ -133,7 +140,7 @@ function renderPostCard(post) {
       <div class="comments-list"></div>
       <div class="comment-form">
         <input type="text" placeholder="เขียนคอมเมนต์...">
-        <button class="btn" style="width:auto;padding:8px 16px;border-radius:16px">ส่ง</button>
+        <button class="btn" style="width:auto; padding:8px 16px; border-radius:16px">ส่ง</button>
       </div>
     </div>
   `;
@@ -148,16 +155,19 @@ function renderPostCard(post) {
     } catch (err) {}
   });
 
-  // ปุ่มลบ
+  // ปุ่มลบโพสต์
   const deleteBtn = card.querySelector('.delete-btn');
   if (deleteBtn) {
     deleteBtn.addEventListener('click', async () => {
-      if (!confirm('ต้องการลบโพสต์นี้ใช่ไหม?')) return;
+      if (!confirm('คุณต้องการลบโพสต์นี้ใช่หรือไม่?')) return;
       try {
         await apiRequest(`/posts/${post._id}`, 'DELETE');
-        card.remove();
-      } catch (err) {
-        card.remove();
+      } catch (err) {}
+      card.remove();
+      const feedContainer = document.getElementById('feedContainer');
+      const feedEmpty = document.getElementById('feedEmpty');
+      if (feedContainer.children.length === 0) {
+        feedEmpty.style.display = 'block';
       }
     });
   }
