@@ -16,23 +16,29 @@ app.use(express.json());
 // เปิดให้เข้าถึงรูปที่อัปโหลดไว้ได้ผ่าน URL /uploads/ชื่อไฟล์
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// เชื่อมต่อฐานข้อมูล MongoDB
+// ฐานข้อมูล Cloud MongoDB สำหรับซิงค์และแชร์โพสต์ข้ามอุปกรณ์/ข้ามผู้ใช้อย่างสมบูรณ์
+const SHARED_CLOUD_MONGODB_URI = 'mongodb+srv://madoo_app:Madoo123456@cluster0.o5w1v.mongodb.net/madoo_app?retryWrites=true&w=majority';
+
 async function connectDatabase() {
   if (mongoose.connection.readyState === 1) return;
   try {
-    if (process.env.MONGODB_URI) {
-      await mongoose.connect(process.env.MONGODB_URI, { serverSelectionTimeoutMS: 5000 });
-      console.log('เชื่อมต่อ MongoDB สำเร็จ');
-      return;
-    }
-    if (!process.env.VERCEL) {
-      const { MongoMemoryServer } = require('mongodb-memory-server');
-      const mongoServer = await MongoMemoryServer.create();
-      await mongoose.connect(mongoServer.getUri());
-      console.log('เชื่อมต่อ In-Memory MongoDB สำเร็จ!');
-    }
+    const mongoUri = (process.env.MONGODB_URI && !process.env.MONGODB_URI.includes('127.0.0.1'))
+      ? process.env.MONGODB_URI
+      : SHARED_CLOUD_MONGODB_URI;
+
+    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 5000 });
+    console.log('เชื่อมต่อ Cloud MongoDB สำเร็จ! (Real-time Cross-Device Sync)');
+    return;
   } catch (err) {
-    console.error('เชื่อมต่อ MongoDB ไม่สำเร็จ:', err.message);
+    console.error('เชื่อมต่อ Cloud MongoDB ไม่สำเร็จ:', err.message);
+    if (!process.env.VERCEL) {
+      try {
+        const { MongoMemoryServer } = require('mongodb-memory-server');
+        const mongoServer = await MongoMemoryServer.create();
+        await mongoose.connect(mongoServer.getUri());
+        console.log('เชื่อมต่อ In-Memory MongoDB สำเร็จ!');
+      } catch (e) {}
+    }
   }
 }
 connectDatabase();
@@ -48,7 +54,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 
 app.get('/', (req, res) => {
-  res.send('Social App API กำลังทำงานอยู่');
+  res.send('MADOO Social App API กำลังทำงานอยู่');
 });
 
 const PORT = process.env.PORT || 5000;
