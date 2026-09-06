@@ -32,6 +32,11 @@
   font-family: 'Plus Jakarta Sans', 'Kanit', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
 body {
   background-color: var(--bg-dark);
   background-image: 
@@ -89,6 +94,7 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
 }
 
 .nav-link:hover, .nav-link.active {
@@ -106,6 +112,7 @@ body {
   font-size: 14px;
   font-weight: 600;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .btn-logout:hover {
@@ -680,14 +687,24 @@ body {
   margin-top: 12px;
 }
 
-.location-picker-row {
+.location-picker-header {
   display: flex;
-  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.location-picker-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 8px;
   margin-top: 8px;
 }
 
 .location-input-field {
-  flex: 1;
+  width: 100%;
+  min-width: 0;
   background: var(--input-bg);
   border: 1px solid var(--input-border);
   border-radius: 10px;
@@ -712,6 +729,7 @@ body {
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s ease;
+  max-width: 100%;
 }
 
 .btn-gps:hover {
@@ -731,6 +749,8 @@ body {
   font-size: 13px;
   font-weight: 600;
   margin-bottom: 10px;
+  max-width: 100%;
+  flex-wrap: wrap;
 }
 
 .post-distance-badge {
@@ -784,6 +804,8 @@ body {
   gap: 8px;
   font-size: 13px;
   color: var(--text-muted);
+  flex-wrap: wrap;
+  max-width: 100%;
 }
 
 .filter-select {
@@ -795,5 +817,127 @@ body {
   font-size: 13px;
   outline: none;
   cursor: pointer;
+  max-width: 100%;
+}
+
+/* Mobile & Tablet Responsiveness */
+@media (max-width: 640px) {
+  .navbar {
+    padding: 10px 14px;
+  }
+
+  .nav-brand {
+    font-size: 18px;
+    gap: 4px;
+  }
+
+  .nav-links {
+    gap: 6px;
+  }
+
+  .nav-link {
+    padding: 6px 10px;
+    font-size: 13px;
+    border-radius: 10px;
+    gap: 4px;
+  }
+
+  .btn-logout {
+    padding: 6px 10px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
+  .container {
+    padding: 0 10px;
+    margin: 16px auto;
+  }
+
+  .card {
+    padding: 14px;
+    border-radius: 16px;
+    margin-bottom: 14px;
+  }
+
+  #mainMap {
+    height: 220px;
+  }
+
+  .location-picker-box {
+    padding: 10px;
+  }
+
+  .location-picker-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .location-name-input {
+    grid-column: 1 / -1;
+  }
+
+  .filter-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .filter-group {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .post-actions-bar {
+    gap: 6px;
+  }
+
+  .action-btn {
+    padding: 8px 6px;
+    font-size: 12px;
+    min-width: 0;
+  }
+
+  .post-header-left {
+    gap: 8px;
+  }
+
+  .avatar {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (max-width: 440px) {
+  .navbar {
+    padding: 8px 8px;
+  }
+
+  .nav-brand {
+    font-size: 16px;
+  }
+
+  .nav-link {
+    padding: 5px 6px;
+    font-size: 12px;
+  }
+
+  .btn-logout {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+
+  .filter-group {
+    font-size: 12px;
+  }
+
+  .file-label {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .btn {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
 }
 

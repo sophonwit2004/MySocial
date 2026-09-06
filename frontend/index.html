@@ -50,7 +50,7 @@
 
     <!-- ตัวเลือกสถานที่/ปักหมุดพิกัดนำทาง -->
     <div class="location-picker-box">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div class="location-picker-header">
         <span style="font-size:13px; font-weight:700; color:var(--text-sub);">📍 ระบุสถานที่ & พิกัดนำทาง GPS</span>
         <button type="button" id="getGpsBtn" class="btn-gps">📡 ใช้ตำแหน่งปัจจุบันของฉัน</button>
       </div>
@@ -67,9 +67,9 @@
       </div>
 
       <div class="location-picker-row">
-        <input type="text" id="locationNameInput" class="location-input-field" placeholder="ชื่อสถานที่ (เช่น วัดเรืองแสง อุบลฯ)">
-        <input type="number" step="any" id="latInput" class="location-input-field" style="max-width:110px;" placeholder="Latitude">
-        <input type="number" step="any" id="lngInput" class="location-input-field" style="max-width:110px;" placeholder="Longitude">
+        <input type="text" id="locationNameInput" class="location-input-field location-name-input" placeholder="ชื่อสถานที่ (เช่น วัดเรืองแสง อุบลฯ)">
+        <input type="number" step="any" id="latInput" class="location-input-field location-coord-input" placeholder="Latitude">
+        <input type="number" step="any" id="lngInput" class="location-input-field location-coord-input" placeholder="Longitude">
       </div>
     </div>
 
